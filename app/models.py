@@ -1,63 +1,81 @@
-from pydantic import BaseModel
+from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, DateTime
+from sqlalchemy.orm import relationship
+
+from .database import Base
 
 
-class achievements_list(BaseModel):
-    id_ach: int
-    name_ach: str
-    req_ach: int
-    limit_ach: bool
-    date_end_if_limit_ach: str
+class User(Base):
+    __tablename__ = "users"
+
+    uid = Column(Integer, primary_key=True, index=True)
+    first_name = Column(String)
+    second_name = Column(String)
+    last_name = Column(String)
+    email = Column(String, unique=True, index=True)
+    hash_password = Column(String)
+
+    # items = relationship("Item", back_populates="owner")
 
 
-class complete_achievements(BaseModel):
-    id_comach: int
-    id_ach: int
-    uid: int
-    date_receive: str
+class Achievements_List(Base):
+    __tablename__ = "achievements_list"
+
+    id_ach = Column(Integer, primary_key=True, index=True)
+    name_ach = Column(String)
+    req_ach = Column(Integer)
+    limit_ach = Column(Boolean)
+    date_end_if_limit_ach = Column(DateTime, nullable=True)
 
 
-class process_achievements(BaseModel):
-    id_proach: int
-    id_ach: int
-    pass_ach: int
+class Complete_Achievements(Base):
+    __tablename__ = "complete_achievements"
+
+    id_comach = Column(Integer, primary_key=True, index=True)
+    id_ach = Column(Integer)
+    uid = Column(Integer)
+    date_receive = Column(DateTime)
 
 
-class users(BaseModel):
-    uid: int
-    first_name: str
-    second_name: str
-    last_name: str
-    email: str
-    hash_pass: str
+class Process_Achievements(Base):
+    __tablename__ = "process_achievements"
+
+    id_proach = Column(Integer, primary_key=True, index=True)
+    id_ach = Column(Integer)
+    pass_ach = Column(Integer)
 
 
-class messages(BaseModel):
-    id_mes: int
-    uid_sender: int
-    uid_recipient: int
-    text_mes: str
-    time_mes: str
+class Messages(Base):
+    __tablename__ = "messages"
+
+    id_mes = Column(Integer, primary_key=True, index=True)
+    uid_sender = Column(Integer)
+    uid_recipient = Column(Integer)
+    text_mes = Column(String)
+    time_mes = Column(DateTime)
 
 
-class saves(BaseModel):
-    id_save: int
-    uid: int
-    date_save: str
-    name_save: str
+class Saves(Base):
+    __tablename__ = "saves"
+
+    id_save = Column(Integer, primary_key=True, index=True)
+    uid = Column(Integer)
+    date_save = Column(DateTime)
+    name_save = Column(String)
 
 
-class coordinators(BaseModel):
-    id_coord: int
-    value_coord: str
-    id_save: int
+class Coordinators(Base):
+    __tablename__ = "coordinators"
+
+    id_coord = Column(Integer, primary_key=True, index=True)
+    value_coord = Column(String)
+    id_save = Column(Integer)
 
 
-class bd_options(BaseModel):
-    id_option: int
-    name_option: str
-    value_option: str
-    
+class Bd_Options(Base):
+    __tablename__ = "bd_options"
 
-
+    id_option = Column(Integer, primary_key=True, index=True)
+    name_option = Column(String)
+    value_option = Column(String)
 
 
