@@ -18,12 +18,6 @@ app.include_router(login_auth.routerUser)
 # app.include_router(achievements.routerAchievements)
 
 
-engine = sqlalchemy.create_engine(
-    DATABASE_URL, connect_args={}
-)
-metadata.create_all(engine)
-
-
 @app.on_event("startup")
 async def startup() -> None:
     await DB.connect()
