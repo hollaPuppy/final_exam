@@ -5,3 +5,5 @@ if not DATABASE_URL:
     from config import CONFIG_DATABASE_URL
 
     DATABASE_URL = CONFIG_DATABASE_URL
+
+EMAIL_EXAMPLE = "emailname@email.ru"

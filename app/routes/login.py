@@ -1,17 +1,13 @@
-import os
-import hashlib
-from fastapi import APIRouter, Request, Response
-from app.db import DB
+from fastapi import APIRouter, Request
 from ..utils.user import hash_password, \
-    send_confirm_letter, \
-    check_password_hash
-
-from ..queries.queries_login import \
-    check_email_exist, \
-    check_username_exist, \
-    registration_user, \
-    get_pass
-
+                         send_confirm_letter, \
+                         check_password_hash
+from ..queries.queries_login import check_email_exist, \
+                                    check_username_exist, \
+                                    registration_user, \
+                                    get_pass
+from .schemas.schemas_login import UserRegSchema, \
+                                   UserAuthSchema
 routerUser = APIRouter(
     prefix='/user',
     tags=['user']
@@ -19,7 +15,7 @@ routerUser = APIRouter(
 
 
 @routerUser.post("/registration")
-async def reg(request: Request) -> str:
+async def reg(request: Request, body: UserRegSchema) -> str:
     req: dict = await request.json()
     username = req.get("username")
     email = req.get("email")
@@ -44,7 +40,7 @@ async def reg(request: Request) -> str:
 
 
 @routerUser.get("/auth")
-async def auth(request: Request) -> str:
+async def auth(request: Request, body: UserAuthSchema) -> str:
     req: dict = await request.json()
     username = req.get("username")
     user_pass = req.get("password")
