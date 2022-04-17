@@ -6,7 +6,7 @@ from ..queries.queries_login import check_email_exist, \
                                     check_username_exist, \
                                     registration_user, \
                                     get_pass
-from .schemas.schemas_login import UserRegSchema, \
+from .schemas.users import UserRegSchema, \
                                    UserAuthSchema
 routerUser = APIRouter(
     prefix='/user',

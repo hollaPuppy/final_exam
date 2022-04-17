@@ -23,13 +23,13 @@ routerAchievements = APIRouter(
 
 
 @routerAchievements.get("/all")
-async def achievements_list() -> str:
+async def achievements_list() -> UJSONResponse:
     response = await get_achievements_list()
     return UJSONResponse({'achieves': response})
 
 
 @routerAchievements.get("/all_limit")
-async def limit_achievements_list() -> list:
+async def limit_achievements_list() -> UJSONResponse:
     response = await get_limit_achievements_list()
     return  UJSONResponse({'achieves': response})
 
