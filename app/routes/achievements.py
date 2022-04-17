@@ -1,7 +1,8 @@
 from fastapi import APIRouter, Request
 from fastapi.responses import UJSONResponse
+
+from .schemas.schemas import Achievements_List_Get
 from ..queries.queries_achievements import get_achievements_list, get_limit_achievements_list
-from app.routes.schemas.schemas import achievements_list
 
 
 routerAchievements = APIRouter(
@@ -10,16 +11,27 @@ routerAchievements = APIRouter(
 )
 
 
+# @routerAchievements.get("/all")
+# async def achievements_list() -> list:
+#     response = await get_achievements_list()
+#     listik = list(map(lambda row: Achievements_List_Get(**row).dict(), response))
+#     for item in listik:
+#         print(item[' '])
+#     print(listik)
+#     print(type(listik))
+#     return list(map(lambda row: Achievements_List_Get(**row).dict(), response))
+
+
 @routerAchievements.get("/all")
-async def achievements_list() -> list:
+async def achievements_list() -> str:
     response = await get_achievements_list()
-    return response
+    return UJSONResponse({'achieves': response})
 
 
 @routerAchievements.get("/all_limit")
 async def limit_achievements_list() -> list:
     response = await get_limit_achievements_list()
-    return response
+    return  UJSONResponse({'achieves': response})
 
 
 # @routerAchievements.post("/new")
