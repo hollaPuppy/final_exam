@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Request
 from fastapi.responses import UJSONResponse
-from ..queries.queries_achievements import get_achievements_list
+from ..queries.queries_achievements import get_achievements_list, get_limit_achievements_list
 from app.routes.schemas.schemas import achievements_list
 
 
@@ -11,10 +11,15 @@ routerAchievements = APIRouter(
 
 
 @routerAchievements.get("/all")
-async def achievements_list() -> str:
+async def achievements_list() -> list:
     response = await get_achievements_list()
     return response
 
+
+@routerAchievements.get("/all_limit")
+async def limit_achievements_list() -> list:
+    response = await get_limit_achievements_list()
+    return response
 
 
 # @routerAchievements.post("/new")

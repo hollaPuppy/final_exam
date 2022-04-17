@@ -1,6 +1,5 @@
 from fastapi import FastAPI
 from app.routes import login, achievements
-import databases
 import sqlalchemy
 from .db import DB
 
