@@ -23,11 +23,11 @@ async def reg(request: Request, body: UserRegSchema) -> str:
 
     check_email = await check_email_exist(email)
     if check_email:
-        return f"lol email"
+        return f"Email already exists"
 
     check_username = await check_username_exist(username)
     if check_username:
-        return f"mda username"
+        return f"User already exists"
 
     hash_pass = hash_password(user_pass)
 
@@ -47,13 +47,14 @@ async def auth(request: Request, body: UserAuthSchema) -> str:
 
     check_username = await check_username_exist(username)
     if check_username is False:
-        return f"mda username"
+        return f"User not found"
 
     db_pass = await get_pass(username)
     if db_pass is None:
-        return f"mda password"
+        return f"Password for user not found"
 
-    print(check_password_hash(user_pass, db_pass))
+    if check_password_hash(user_pass, db_pass) is False:
+        return f"Wrong password"
 
     return f"okay"
 
