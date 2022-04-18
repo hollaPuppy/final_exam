@@ -11,17 +11,18 @@ class Achievements_List_Get(BaseModel):
 class Achievements_Limit_List_Get(BaseModel):
     name_ach: str
     req_ach: int
-    date_end_if_limit_ach: Optional[str]
+    date_end_if_limit_ach: str
 
 
-class Complete_Achievements(BaseModel):
-    id_comach: int
-    id_ach: int
-    uid: int
+class Complete_Achievements_List_Get(BaseModel):
+    name_ach: str
+    username: str
     date_receive: str
 
 
-class Process_Achievements(BaseModel):
-    id_proach: int
-    id_ach: int
-    pass_ach: int
+class Process_Achievements_List_Get(BaseModel):
+    name_ach: str
+    username: str
+    req_ach: str
+    pass_ach: str
+    date_limit: Optional[str]
