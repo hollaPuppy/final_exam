@@ -84,7 +84,7 @@ CREATE TABLE coordinations (
   coord_id integer NOT NULL,
   coord_pos varchar(255) NOT NULL,
   coord_rot varchar(255) NOT NULL,
-  save_id varchar(255) NOT NULL,
+  save_id integer NOT NULL,
   PRIMARY KEY (coord_id),
   CONSTRAINT coordinations_save_id_saves_save_id_foreign FOREIGN KEY (save_id) REFERENCES saves (save_id)
 );
