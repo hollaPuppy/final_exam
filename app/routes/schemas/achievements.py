@@ -4,25 +4,28 @@ from pydantic import BaseModel
 
 
 class Achievements_List_Get(BaseModel):
-    name_ach: str
-    req_ach: int
+    achv_name: str
+    achv_req: int
+    achv_is_limit: Optional[bool]
+    achv_date_end_if_limit: Optional[str]
 
 
 class Achievements_Limit_List_Get(BaseModel):
-    name_ach: str
-    req_ach: int
-    date_end_if_limit_ach: str
+    achv_name: str
+    achv_req: int
+    achv_date_end_if_limit: str
 
 
 class Complete_Achievements_List_Get(BaseModel):
-    name_ach: str
+    achv_name: str
     username: str
-    date_receive: str
+    receive_date: str
 
 
 class Process_Achievements_List_Get(BaseModel):
-    name_ach: str
+    achv_name: str
     username: str
-    req_ach: str
-    pass_ach: str
-    date_limit: Optional[str]
+    achv_req: str
+    achv_pass: str
+    achv_is_limit: Optional[bool]
+    achv_date_end_if_limit: Optional[str]
