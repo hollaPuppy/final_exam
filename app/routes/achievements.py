@@ -40,13 +40,17 @@ async def complete_achievements_list(username: str) -> UJSONResponse:
     return UJSONResponse({'complete_achieves': response})
 
 
-@routerAchievements.get("/process/all")
-async def complete_achievements_list() -> UJSONResponse:
-    response = await get_complete_achievements_list()
-    return UJSONResponse({'complete_achieves': response})
-
-
 @routerAchievements.get("/process/{username}")
 async def complete_achievements_list(username: str) -> UJSONResponse:
-    response = await get_complete_achievements_by_username(username)
-    return UJSONResponse({'complete_achieves': response})
+    if username == 'all':
+        response = await get_process_achievements_list()
+    else:
+        response = await get_process_achievements_by_username(username)
+
+    return UJSONResponse({'process_achieves': response})
+
+
+# @routerAchievements.get("/process/{username}")
+# async def complete_achievements_list(username: str) -> UJSONResponse:
+#     response = await get_complete_achievements_by_username(username)
+#     return UJSONResponse({'complete_achieves': response})

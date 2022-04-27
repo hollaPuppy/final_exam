@@ -29,3 +29,4 @@ class Process_Achievements_List_Get(BaseModel):
     achv_pass: str
     achv_is_limit: Optional[bool]
     achv_date_end_if_limit: Optional[str]
+
