@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Request
 from fastapi.responses import UJSONResponse
+
 from ..queries.queries_saves import create_save_record, \
                                     get_save_record_id, \
                                     create_puz_records, \
@@ -8,7 +9,7 @@ from ..queries.queries_saves import create_save_record, \
                                     get_saves_by_username, \
                                     get_coords_by_save_id, \
                                     get_complete_puzzles_list
-from datetime import datetime
+
 from .schemas.saves import Saves_Set_New, Saves_Full_Info
 from ..utils.saves import create_puz_id_list
 
@@ -54,7 +55,7 @@ async def set_save(request: Request, body: Saves_Set_New) -> str:
 
 @routerSave.get("/list/{username}")
 async def saves_list(username: str) -> UJSONResponse:
-    response = await get_process_achievements_list()
+    response = await get_saves_by_username(username)
 
     return UJSONResponse({'saves': response})
 
