@@ -14,6 +14,21 @@ CREATE TABLE bd_options (
   PRIMARY KEY (id_option)
 );
 
+CREATE TABLE lobbys (
+  lob_id integer NOT NULL,
+  lob_is_open boolean NOT NULL,
+  lob_pass_code varchar(255) NOT NULL,
+  PRIMARY KEY (lob_id)
+);
+
+CREATE TABLE notifications (
+  ntfct_id integer NOT NULL,
+  ntfct_title varchar(255) NOT NULL,
+  ntfct_text varchar(255) NOT NULL,
+  ntfct_date date NOT NULL,
+  PRIMARY KEY (ntfct_id)
+);
+
 CREATE TABLE puzzles_list (
   puz_id integer NOT NULL,
   puz_name varchar(255) NOT NULL,
@@ -39,6 +54,16 @@ CREATE TABLE complete_achievements (
   CONSTRAINT complete_achievements_id_ach_achievements_list_id_ach_foreign FOREIGN KEY (achv_id) REFERENCES achievements_list (achv_id)
 );
 
+CREATE TABLE lobbys_users (
+  lob_usr_id integer NOT NULL,
+  uid integer NOT NULL,
+  lob_is_cap integer NOT NULL,
+  lob_id integer NOT NULL,
+  PRIMARY KEY (lob_usr_id),
+  CONSTRAINT lobby_user_list_uid_users_uid_foreign FOREIGN KEY (uid) REFERENCES users (uid),
+  CONSTRAINT lobby_user_list_lob_id_lobbys_lob_id_foreign FOREIGN KEY (lob_id) REFERENCES lobbys (lob_id)
+);
+
 CREATE TABLE messages (
   msg_id integer NOT NULL,
   sender_uid integer NOT NULL,
@@ -48,6 +73,15 @@ CREATE TABLE messages (
   PRIMARY KEY (msg_id),
   CONSTRAINT messages_uid_sender_users_uid_foreign FOREIGN KEY (sender_uid) REFERENCES users (uid),
   CONSTRAINT messages_uid_recipient_users_uid_foreign FOREIGN KEY (recipient_uid) REFERENCES users (uid)
+);
+
+CREATE TABLE notifications_users (
+  ntfct_usr_id integer NOT NULL,
+  ntfct_id integer NOT NULL,
+  uid integer NOT NULL,
+  PRIMARY KEY (ntfct_usr_id),
+  CONSTRAINT notifications_users_ntfct_id_notifications_ntfct_id_foreign FOREIGN KEY (ntfct_id) REFERENCES notifications (ntfct_id),
+  CONSTRAINT notifications_users_uid_users_uid_foreign FOREIGN KEY (uid) REFERENCES users (uid)
 );
 
 CREATE TABLE process_achievements (
@@ -65,7 +99,6 @@ CREATE TABLE saves (
   uid integer NOT NULL,
   save_date timestamp NOT NULL,
   save_name varchar(255) NOT NULL,
-  puz_id integer NOT NULL,
   PRIMARY KEY (save_id),
   CONSTRAINT saves_id_save_users_uid_foreign FOREIGN KEY (uid) REFERENCES users (uid)
 );
@@ -84,7 +117,7 @@ CREATE TABLE coordinations (
   coord_id integer NOT NULL,
   coord_pos varchar(255) NOT NULL,
   coord_rot varchar(255) NOT NULL,
-  save_id integer NOT NULL,
+  save_id varchar(255) NOT NULL,
   PRIMARY KEY (coord_id),
   CONSTRAINT coordinations_save_id_saves_save_id_foreign FOREIGN KEY (save_id) REFERENCES saves (save_id)
 );

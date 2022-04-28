@@ -3,7 +3,9 @@ from fastapi.responses import UJSONResponse
 from ..queries.queries_achievements import get_achievements_list, \
                                            get_limit_achievements_list, \
                                            get_complete_achievements_list, \
-                                           get_complete_achievements_by_username
+                                           get_complete_achievements_by_username, \
+                                           post_achievement
+from .schemas.achievements import Achievements_New
 
 
 routerAchievements = APIRouter(
@@ -22,12 +24,6 @@ async def achievements_list() -> UJSONResponse:
 async def limit_achievements_list() -> UJSONResponse:
     response = await get_limit_achievements_list()
     return UJSONResponse({'limit_achieves': response})
-
-
-# @routerAchievements.get("/complete/all")
-# async def complete_achievements_list() -> UJSONResponse:
-#     response = await get_complete_achievements_list()
-#     return UJSONResponse({'complete_achieves': response})
 
 
 @routerAchievements.get("/complete/{username}")
@@ -49,8 +45,11 @@ async def complete_achievements_list(username: str) -> UJSONResponse:
 
     return UJSONResponse({'process_achieves': response})
 
+# _______________POST___________
 
-# @routerAchievements.get("/process/{username}")
-# async def complete_achievements_list(username: str) -> UJSONResponse:
-#     response = await get_complete_achievements_by_username(username)
-#     return UJSONResponse({'complete_achieves': response})
+
+@routerAchievements.post("/new")
+async def new_achievement(request: Request, body: Achievements_New) -> str:
+    await post_achievement(request)
+    return "ok"
+
