@@ -1,2 +1,2 @@
 Схема базы данных:
-![Database](img/db.jpg)
+![Database](img/db.png)
