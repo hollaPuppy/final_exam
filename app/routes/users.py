@@ -2,7 +2,7 @@ from fastapi import APIRouter, Request
 from ..utils.users import hash_password, \
                          send_confirm_letter, \
                          check_password_hash
-from ..queries.queries_login import check_email_exist, \
+from ..queries.queries_users import check_email_exist, \
                                     check_username_exist, \
                                     registration_user, \
                                     get_pass

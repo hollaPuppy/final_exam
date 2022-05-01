@@ -14,10 +14,13 @@ CREATE TABLE bd_options (
   PRIMARY KEY (id_option)
 );
 
-CREATE TABLE lobbys (
+CREATE TABLE lobbies (
   lob_id integer NOT NULL,
-  lob_is_open boolean NOT NULL,
-  lob_pass_code varchar(255) NOT NULL,
+  lob_is_closed boolean NOT NULL,
+  lob_pass_code varchar(255) DEFAULT NULL,
+  lob_name varchar(255) NOT NULL,
+  lob_create_date timestamp NOT NULL,
+  lob_is_full boolean NOT NULL,
   PRIMARY KEY (lob_id)
 );
 
@@ -54,14 +57,14 @@ CREATE TABLE complete_achievements (
   CONSTRAINT complete_achievements_id_ach_achievements_list_id_ach_foreign FOREIGN KEY (achv_id) REFERENCES achievements_list (achv_id)
 );
 
-CREATE TABLE lobbys_users (
+CREATE TABLE lobbies_users (
   lob_usr_id integer NOT NULL,
   uid integer NOT NULL,
-  lob_is_cap integer NOT NULL,
+  lob_is_cap boolean NOT NULL,
   lob_id integer NOT NULL,
   PRIMARY KEY (lob_usr_id),
   CONSTRAINT lobby_user_list_uid_users_uid_foreign FOREIGN KEY (uid) REFERENCES users (uid),
-  CONSTRAINT lobby_user_list_lob_id_lobbys_lob_id_foreign FOREIGN KEY (lob_id) REFERENCES lobbys (lob_id)
+  CONSTRAINT lobbies_users_lob_id_lobbies_lob_id_foreign FOREIGN KEY (lob_id) REFERENCES lobbies (lob_id)
 );
 
 CREATE TABLE messages (
@@ -117,7 +120,7 @@ CREATE TABLE coordinations (
   coord_id integer NOT NULL,
   coord_pos varchar(255) NOT NULL,
   coord_rot varchar(255) NOT NULL,
-  save_id varchar(255) NOT NULL,
+  save_id integer NOT NULL,
   PRIMARY KEY (coord_id),
   CONSTRAINT coordinations_save_id_saves_save_id_foreign FOREIGN KEY (save_id) REFERENCES saves (save_id)
 );

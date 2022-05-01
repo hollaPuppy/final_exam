@@ -9,8 +9,8 @@ from .schemas.achievements import Achievements_New
 
 
 routerAchievements = APIRouter(
-    prefix='/achievements',
-    tags=['achievements']
+    prefix='/achievement',
+    tags=['achievement']
 )
 
 
@@ -50,6 +50,11 @@ async def complete_achievements_list(username: str) -> UJSONResponse:
 
 @routerAchievements.post("/new")
 async def new_achievement(request: Request, body: Achievements_New) -> str:
-    await post_achievement(request)
-    return "ok"
+    req: dict = await request.json()
+    achv_name = req.get("achv_name")
+    achv_req = req.get("achv_req")
+    achv_is_limit = req.get("achv_is_limit")
+    achv_date_end_if_limit = req.get("achv_date_end_if_limit")
+    response = await post_achievement(achv_name, achv_req, achv_is_limit, achv_date_end_if_limit)
+    return response
 

@@ -1,4 +1,5 @@
 from app.db import DB
+from typing import Optional
 from app.routes.schemas.achievements import Achievements_List_Get,\
                                             Achievements_Limit_List_Get, \
                                             Complete_Achievements_List_Get, \
@@ -78,12 +79,10 @@ async def get_process_achievements_by_username(username: str) -> list:
 # __________POST_________________
 
 
-async def post_achievement(request: dict) -> None:
-    req: dict = await request.json()
-    achv_name = req.get("achv_name")
-    achv_req = req.get("achv_req")
-    achv_is_limit = req.get("achv_is_limit")
-    achv_date_end_if_limit = req.get("achv_date_end_if_limit")
+async def post_achievement(achv_name: str,
+                           achv_req: int,
+                           achv_is_limit: Optional[bool],
+                           achv_date_end_if_limit: Optional[str]) -> str:
     query = f"""
          insert into achievements_list(achv_name, achv_req, achv_is_limit, achv_date_end_if_limit)
          values ($1, $2, $3, $4)
