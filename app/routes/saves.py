@@ -1,6 +1,6 @@
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, \
+                    Request
 from fastapi.responses import UJSONResponse
-
 from ..queries.queries_saves import create_save_record, \
                                     get_save_record_id, \
                                     create_puz_records, \
@@ -9,8 +9,8 @@ from ..queries.queries_saves import create_save_record, \
                                     get_saves_by_username, \
                                     get_coords_by_save_id, \
                                     get_complete_puzzles_list
-
-from .schemas.saves import Saves_Set_New, Saves_Full_Info
+from .schemas.saves import Saves_Set_New, \
+                           Saves_Full_Info
 from ..utils.saves import create_puz_id_list
 
 routerSave = APIRouter(
@@ -31,9 +31,10 @@ async def set_save(request: Request, body: Saves_Set_New) -> str:
     if await create_save_record(username, save_name) != f"ok":
         return 'Some bad with create save record'
     save_record_id = await get_save_record_id(username, save_name)
-    puz_id_list = create_puz_id_list(int(save_record_id), puz_id_list)
+    puz_id_list = await create_puz_id_list(int(save_record_id), puz_id_list)
     await create_puz_records(puz_id_list)
     await create_coords_records(coord_pos, coord_rot, int(save_record_id))
+
     return f"all good"
 
 
@@ -47,9 +48,10 @@ async def set_save(request: Request, body: Saves_Set_New) -> str:
     puz_id_list = req.get("puz_id_list")
 
     save_record_id = await get_save_record_id(username, save_name)
-    puz_id_list = create_puz_id_list(int(save_record_id), puz_id_list)
+    puz_id_list = await create_puz_id_list(int(save_record_id), puz_id_list)
     await create_puz_records(puz_id_list)
     await update_coords_records(coord_pos, coord_rot, int(save_record_id))
+
     return f"all good"
 
 
@@ -69,4 +71,5 @@ async def saves_list(request: Request, body: Saves_Full_Info) -> UJSONResponse:
     response_coords = await get_coords_by_save_id(int(save_record_id))
     com_puz_lst = await get_complete_puzzles_list(38)
     com_puz_str = ";".join(map(lambda row:str((row.get('puz_id'))), com_puz_lst))
+
     return UJSONResponse({"coords": response_coords, "complete_puzzles": com_puz_str})

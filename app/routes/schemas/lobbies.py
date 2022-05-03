@@ -19,3 +19,10 @@ class Lobbies_Get_In(BaseModel):
     uid: int
 
 
+class Lobbies_Get_Out(BaseModel):
+    lob_id: int
+    uid: int
+
+
+class Lobbies_Put_Cap(BaseModel):
+    lob_id: int

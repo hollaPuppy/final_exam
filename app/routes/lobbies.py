@@ -1,12 +1,23 @@
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, \
+                    Request
 from fastapi.responses import UJSONResponse
 from datetime import datetime
-
 from .schemas.lobbies import Lobbies_New, \
-    Lobbies_Get_In
-from ..queries.queries_lobbies import get_lobbies_list, \
-    post_lobby, \
-    post_cap_lobby
+                             Lobbies_Get_In, \
+                             Lobbies_Get_Out, \
+                             Lobbies_Put_Cap
+from ..queries.queries_lobbies import get_lob_list, \
+                                      get_lob_pass, \
+                                      get_lob_fullness, \
+                                      get_lob_id, \
+                                      get_lob_usr_count, \
+                                      get_lob_usr_is_cap, \
+                                      get_lob_usr_id, \
+                                      post_lob, \
+                                      post_lob_usr, \
+                                      put_lob_usr_role, \
+                                      delete_lob_usr, \
+                                      delete_lob
 from ..utils.lobbies import gen_pass_code
 
 routerLobbies = APIRouter(
@@ -33,9 +44,9 @@ async def new_lobby(request: Request, body: Lobbies_New) -> UJSONResponse:
     uid = req.get("uid")
     if lob_is_open:
         lob_pass_code = gen_pass_code()
-    await post_lobby(lob_is_closed, lob_pass_code, lob_name, lob_create_date)
-    lod_id = await get_created_lobby(lob_name, lob_create_date)
-    await post_cap_lobby(uid, lod_id)
+    await post_lob(lob_is_closed, lob_pass_code, lob_name, lob_create_date)
+    lod_id = await get_lob_id(lob_name, lob_create_date)
+    await post_lob_usr(uid, 1, lod_id)
 
     return UJSONResponse({"lob_id": lod_id, "lob_pass_code": lob_pass_code})
 
@@ -46,16 +57,42 @@ async def connect_to_lobby(request: Request, body: Lobbies_Get_In) -> str:
     lob_id = req.get("lob_id")
     lob_pass_code = req.get("lob_pass_code")
     uid = req.get("uid")
-    print(lob_id, lob_pass_code, uid)
-    if lob_pass_code is None:
-        print('That is open lobby')
-    # нужно: проверять открытость лобби, заполненность, сверить коды доступа, подумать что делать, если приходит пустой
-    # пароль и какой-то, добавлять записьв лоб_юз, менять флаг заполненности
+    if lob_pass_code != await get_lob_pass(lob_id):
+        if lob_pass_code is None:
+            return f"Missing password"
+        else:
+            return f"Wrong pass code"
+    if await get_lob_fullness(lob_id):
+        return f"Lobby already filled"
+    await post_lob_usr(uid, 0, lod_id)
+    await put_lob_fullness(lob_id)
+
     return "ok"
 
 
 @routerLobbies.post("/get/out")
-async def disconnect_from_lobby(request: Request, body: Lobbies_New) -> str:
-    sm = 'sm'
-    # проверять кто вышел - кэп или простой, если кэп - пекредавать флаг кэпа, если нет - просто удалять запись в лоб_эз
-    # затем проверять кол-во записей вс лоб_юзерс - 0=удалять запись из лобис
+async def disconnect_from_lobby(request: Request, body: Lobbies_Get_In) -> str:
+    req: dict = await request.json()
+    lob_id = req.get("lob_id")
+    uid = req.get("uid")
+    cap_flag = await get_lob_usr_is_cap(uid, lob_id)
+    await delete_lob_usr(uid, lob_id)
+    if await get_lob_usr_count(lob_id) == 0:
+        await delete_lob(lob_id)
+        return f"Since the lobby became empty it was removed"
+    else:
+        if cap_flag:
+            second_uid = await get_lob_usr_id(lob_id)
+            await put_lob_usr_role(second_uid, true, lob_id)
+    return f"Capitan switched"
+
+
+@routerLobbies.put("/put/cap")
+async def put_lobby_cap(request: Request, body: Lobbies_Put_Cap) -> str:
+    req: dict = await request.json()
+    lob_id = req.get("lob_id")
+    cap_uid = await get_lob_usr_id(lob_id, true)
+    second_uid = await get_lob_usr_id(lob_id, false)
+    await put_lob_usr_role(cap_uid, false, lob_id)
+    await put_lob_usr_role(second_uid, true, lob_id)
+    return f"Capitan switched"

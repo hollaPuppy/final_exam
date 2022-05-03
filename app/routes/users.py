@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, \
+                    Request
 from ..utils.users import hash_password, \
                          send_confirm_letter, \
                          check_password_hash
@@ -29,13 +30,14 @@ async def reg(request: Request, body: UserRegSchema) -> str:
     if check_username:
         return f"User already exists"
 
-    hash_pass = hash_password(user_pass)
+    hash_pass = await hash_password(user_pass)
 
-    answer_code = send_confirm_letter(email)
+    answer_code = await send_confirm_letter(email)
     if len(answer_code) != 4:
         return f"smth wrong with sending email"
 
     await registration_user(username, email, hash_pass)
+
     return answer_code
 
 
@@ -53,7 +55,7 @@ async def auth(request: Request, body: UserAuthSchema) -> str:
     if db_pass is None:
         return f"Password for user not found"
 
-    if check_password_hash(user_pass, db_pass) is False:
+    if await check_password_hash(user_pass, db_pass) is False:
         return f"Wrong password"
 
     return f"okay"

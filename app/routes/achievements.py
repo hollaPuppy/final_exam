@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, \
+                    Request
 from fastapi.responses import UJSONResponse
 from ..queries.queries_achievements import get_achievements_list, \
                                            get_limit_achievements_list, \
