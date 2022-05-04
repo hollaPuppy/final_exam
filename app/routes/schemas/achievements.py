@@ -16,13 +16,13 @@ class Achievements_Limit_List_Get(BaseModel):
     achv_date_end_if_limit: str
 
 
-class Complete_Achievements_List_Get(BaseModel):
+class Achievements_Complete_List_Get(BaseModel):
     achv_name: str
     username: str
     receive_date: str
 
 
-class Process_Achievements_List_Get(BaseModel):
+class Achievements_Process_List_Get(BaseModel):
     achv_name: str
     username: str
     achv_req: str

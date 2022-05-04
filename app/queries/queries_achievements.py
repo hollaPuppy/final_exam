@@ -2,8 +2,8 @@ from app.db import DB
 from typing import Optional
 from app.routes.schemas.achievements import Achievements_List_Get,\
                                             Achievements_Limit_List_Get, \
-                                            Complete_Achievements_List_Get, \
-                                            Process_Achievements_List_Get
+                                            Achievements_Complete_List_Get, \
+                                            Achievements_Process_List_Get
 
 
 async def get_achievements_list() -> list:

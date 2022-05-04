@@ -28,7 +28,7 @@ CREATE TABLE notifications (
   ntfct_id integer NOT NULL,
   ntfct_title varchar(255) NOT NULL,
   ntfct_text varchar(255) NOT NULL,
-  ntfct_date date NOT NULL,
+  ntfct_date timestamp NOT NULL,
   PRIMARY KEY (ntfct_id)
 );
 
@@ -51,7 +51,7 @@ CREATE TABLE complete_achievements (
   com_achv_id integer NOT NULL,
   achv_id integer NOT NULL,
   uid integer NOT NULL,
-  receive_date timestamp NOT NULL,
+  achv_receive_date timestamp NOT NULL,
   PRIMARY KEY (com_achv_id),
   CONSTRAINT complete_achievements_uid_users_uid_foreign FOREIGN KEY (uid) REFERENCES users (uid),
   CONSTRAINT complete_achievements_id_ach_achievements_list_id_ach_foreign FOREIGN KEY (achv_id) REFERENCES achievements_list (achv_id)
@@ -82,6 +82,7 @@ CREATE TABLE notifications_users (
   ntfct_usr_id integer NOT NULL,
   ntfct_id integer NOT NULL,
   uid integer NOT NULL,
+  ntfct_opened boolean NOT NULL,
   PRIMARY KEY (ntfct_usr_id),
   CONSTRAINT notifications_users_ntfct_id_notifications_ntfct_id_foreign FOREIGN KEY (ntfct_id) REFERENCES notifications (ntfct_id),
   CONSTRAINT notifications_users_uid_users_uid_foreign FOREIGN KEY (uid) REFERENCES users (uid)

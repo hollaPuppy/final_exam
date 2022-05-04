@@ -87,6 +87,8 @@ async def disconnect_from_lobby(request: Request, body: Lobbies_Get_In) -> str:
     return f"Capitan switched"
 
 
+# _______________PUT___________
+
 @routerLobbies.put("/put/cap")
 async def put_lobby_cap(request: Request, body: Lobbies_Put_Cap) -> str:
     req: dict = await request.json()

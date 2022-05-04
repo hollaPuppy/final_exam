@@ -7,8 +7,8 @@ from ..queries.queries_users import check_email_exist, \
                                     check_username_exist, \
                                     registration_user, \
                                     get_pass
-from .schemas.users import UserRegSchema, \
-                           UserAuthSchema
+from .schemas.users import User_Reg, \
+                           User_Auth
 routerUser = APIRouter(
     prefix='/user',
     tags=['user']
@@ -16,7 +16,7 @@ routerUser = APIRouter(
 
 
 @routerUser.post("/registration")
-async def reg(request: Request, body: UserRegSchema) -> str:
+async def reg(request: Request, body: User_Reg) -> str:
     req: dict = await request.json()
     username = req.get("username")
     email = req.get("email")
@@ -42,7 +42,7 @@ async def reg(request: Request, body: UserRegSchema) -> str:
 
 
 @routerUser.get("/auth")
-async def auth(request: Request, body: UserAuthSchema) -> str:
+async def auth(request: Request, body: User_Auth) -> str:
     req: dict = await request.json()
     username = req.get("username")
     user_pass = req.get("password")

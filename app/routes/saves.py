@@ -70,6 +70,6 @@ async def saves_list(request: Request, body: Saves_Full_Info) -> UJSONResponse:
     save_record_id = await get_save_record_id(username, save_name)
     response_coords = await get_coords_by_save_id(int(save_record_id))
     com_puz_lst = await get_complete_puzzles_list(38)
-    com_puz_str = ";".join(map(lambda row:str((row.get('puz_id'))), com_puz_lst))
+    com_puz_str = ";".join(map(lambda row: str(row.get('puz_id')), com_puz_lst))
 
     return UJSONResponse({"coords": response_coords, "complete_puzzles": com_puz_str})
