@@ -1,64 +1,65 @@
 from fastapi import APIRouter, \
-                    Request
+                    Request, \
+                    HTTPException
+from fastapi.responses import UJSONResponse
 from ..utils.users import hash_password, \
-                         send_confirm_letter, \
-                         check_password_hash
-from ..queries.queries_users import check_email_exist, \
-                                    check_username_exist, \
-                                    registration_user, \
-                                    get_pass
+                          send_confirm_letter, \
+                          check_password_hash
+from ..queries.queries_users import get_check_email_exist, \
+                                    get_check_username_exist, \
+                                    get_pass, \
+                                    get_uid_by_username, \
+                                    post_registration_user
 from .schemas.users import User_Reg, \
                            User_Auth
 routerUser = APIRouter(
-    prefix='/user',
-    tags=['user']
+    prefix='/users',
+    tags=['users']
 )
 
 
 @routerUser.post("/registration")
 async def reg(request: Request, body: User_Reg) -> str:
     req: dict = await request.json()
-    username = req.get("username")
-    email = req.get("email")
-    user_pass = req.get("password")
+    user_name = req.get("username")
+    user_email = req.get("email")
+    user_password = req.get("password")
 
-    check_email = await check_email_exist(email)
-    if check_email:
-        return f"Email already exists"
+    if await get_check_email_exist(user_email):
+        raise HTTPException(status_code=409, detail=f"Email already exists")
 
-    check_username = await check_username_exist(username)
-    if check_username:
-        return f"User already exists"
+    if await get_check_username_exist(user_name):
 
-    hash_pass = await hash_password(user_pass)
+        raise HTTPException(status_code=409, detail=f"User already exists")
+    hash_pass = await hash_password(user_password)
 
-    answer_code = await send_confirm_letter(email)
+    answer_code = await send_confirm_letter(user_email)
     if len(answer_code) != 4:
-        return f"smth wrong with sending email"
+        raise HTTPException(status_code=500, detail=f"Bad email sending")
 
-    await registration_user(username, email, hash_pass)
+    if not await post_registration_user(user_name, user_email, hash_pass):
+        raise HTTPException(status_code=500, detail=f"User has not been registered")
 
-    return answer_code
+    uid = get_uid_by_username(user_name)
+
+    return UJSONResponse({'code': answer_code, 'uid': uid})
 
 
 @routerUser.get("/auth")
 async def auth(request: Request, body: User_Auth) -> str:
     req: dict = await request.json()
-    username = req.get("username")
-    user_pass = req.get("password")
+    user_name = req.get("username")
+    user_password = req.get("password")
 
-    check_username = await check_username_exist(username)
-    if check_username is False:
-        return f"User not found"
+    if not await get_check_username_exist(user_name):
+        raise HTTPException(status_code=404, detail=f"User {username} not found")
 
-    db_pass = await get_pass(username)
-    if db_pass is None:
-        return f"Password for user not found"
+    db_pass = await get_pass(user_name)
 
-    if await check_password_hash(user_pass, db_pass) is False:
-        return f"Wrong password"
+    if await check_password_hash(user_password, db_pass) is False:
+        raise HTTPException(status_code=409, detail=f"Wrong password")
 
-    return f"okay"
+    return HTTPException(status_code=200, detail=f"OK")
 
 
 

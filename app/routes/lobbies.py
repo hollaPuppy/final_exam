@@ -1,5 +1,6 @@
 from fastapi import APIRouter, \
-                    Request
+                    Request, \
+                    HTTPException
 from fastapi.responses import UJSONResponse
 from datetime import datetime
 from .schemas.lobbies import Lobbies_New, \
@@ -29,6 +30,9 @@ routerLobbies = APIRouter(
 @routerLobbies.get("/all")
 async def lobbies_list() -> UJSONResponse:
     response = await get_lobbies_list()
+    if not response:
+        raise HTTPException(status_code=404, detail=f"Lobbies not found")
+
     return UJSONResponse({'lobbies': response})
 
 
@@ -44,11 +48,12 @@ async def new_lobby(request: Request, body: Lobbies_New) -> UJSONResponse:
     uid = req.get("uid")
     if lob_is_open:
         lob_pass_code = gen_pass_code()
+
     await post_lob(lob_is_closed, lob_pass_code, lob_name, lob_create_date)
     lod_id = await get_lob_id(lob_name, lob_create_date)
     await post_lob_usr(uid, 1, lod_id)
 
-    return UJSONResponse({"lob_id": lod_id, "lob_pass_code": lob_pass_code})
+    return HTTPException(status_code=200, detail=f"OK")
 
 
 @routerLobbies.post("/get/in")
@@ -59,15 +64,17 @@ async def connect_to_lobby(request: Request, body: Lobbies_Get_In) -> str:
     uid = req.get("uid")
     if lob_pass_code != await get_lob_pass(lob_id):
         if lob_pass_code is None:
-            return f"Missing password"
+            raise HTTPException(status_code=404, detail=f"Password not found")
         else:
-            return f"Wrong pass code"
+            raise HTTPException(status_code=400, detail=f"Wrong password")
+
     if await get_lob_fullness(lob_id):
-        return f"Lobby already filled"
+        raise HTTPException(status_code=400, detail=f"Lobby already filled")
+
     await post_lob_usr(uid, 0, lod_id)
     await put_lob_fullness(lob_id)
 
-    return "ok"
+    return HTTPException(status_code=200, detail=f"OK")
 
 
 @routerLobbies.post("/get/out")
@@ -77,14 +84,16 @@ async def disconnect_from_lobby(request: Request, body: Lobbies_Get_In) -> str:
     uid = req.get("uid")
     cap_flag = await get_lob_usr_is_cap(uid, lob_id)
     await delete_lob_usr(uid, lob_id)
+
     if await get_lob_usr_count(lob_id) == 0:
         await delete_lob(lob_id)
-        return f"Since the lobby became empty it was removed"
+        return HTTPException(status_code=200, detail=f"Since the lobby became empty it was removed")
     else:
         if cap_flag:
             second_uid = await get_lob_usr_id(lob_id)
             await put_lob_usr_role(second_uid, true, lob_id)
-    return f"Capitan switched"
+
+    return HTTPException(status_code=200, detail=f"Capitan switched")
 
 
 # _______________PUT___________
@@ -97,4 +106,5 @@ async def put_lobby_cap(request: Request, body: Lobbies_Put_Cap) -> str:
     second_uid = await get_lob_usr_id(lob_id, false)
     await put_lob_usr_role(cap_uid, false, lob_id)
     await put_lob_usr_role(second_uid, true, lob_id)
-    return f"Capitan switched"
+
+    return HTTPException(status_code=200, detail=f"Capitan switched")

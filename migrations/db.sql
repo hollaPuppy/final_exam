@@ -8,10 +8,10 @@ CREATE TABLE achievements_list (
 );
 
 CREATE TABLE bd_options (
-  id_option integer NOT NULL,
-  name_option varchar(255) DEFAULT NULL,
-  value_option varchar(255) NOT NULL,
-  PRIMARY KEY (id_option)
+  option_id integer NOT NULL,
+  option_name varchar(255) DEFAULT NULL,
+  option_value varchar(255) NOT NULL,
+  PRIMARY KEY (option_id)
 );
 
 CREATE TABLE lobbies (
@@ -40,10 +40,10 @@ CREATE TABLE puzzles_list (
 
 CREATE TABLE users (
   uid integer NOT NULL,
-  username varchar(255) DEFAULT NULL,
-  email varchar(255) NOT NULL,
-  hash_pass varchar(255) NOT NULL,
-  active_time varchar(255) DEFAULT NULL,
+  user_name varchar(255) DEFAULT NULL,
+  user_email varchar(255) NOT NULL,
+  user_hash_pass varchar(255) NOT NULL,
+  user_active_time varchar(255) DEFAULT NULL,
   PRIMARY KEY (uid)
 );
 
@@ -69,13 +69,13 @@ CREATE TABLE lobbies_users (
 
 CREATE TABLE messages (
   msg_id integer NOT NULL,
-  sender_uid integer NOT NULL,
-  recipient_uid integer NOT NULL,
+  msg_sender_uid integer NOT NULL,
+  msg_recipient_uid integer NOT NULL,
   msg_text varchar(255) NOT NULL,
   msg_time varchar(255) NOT NULL,
   PRIMARY KEY (msg_id),
-  CONSTRAINT messages_uid_sender_users_uid_foreign FOREIGN KEY (sender_uid) REFERENCES users (uid),
-  CONSTRAINT messages_uid_recipient_users_uid_foreign FOREIGN KEY (recipient_uid) REFERENCES users (uid)
+  CONSTRAINT messages_uid_sender_users_uid_foreign FOREIGN KEY (msg_sender_uid) REFERENCES users (uid),
+  CONSTRAINT messages_uid_recipient_users_uid_foreign FOREIGN KEY (msg_recipient_uid) REFERENCES users (uid)
 );
 
 CREATE TABLE notifications_users (
@@ -110,7 +110,7 @@ CREATE TABLE saves (
 CREATE TABLE complete_puzzles (
   com_puz_id integer NOT NULL,
   puz_id integer NOT NULL,
-  receive_date timestamp NOT NULL,
+  com_puz_receive_date timestamp NOT NULL,
   save_id integer NOT NULL,
   PRIMARY KEY (com_puz_id),
   CONSTRAINT complete_puzzles_save_id_saves_save_id_foreign FOREIGN KEY (save_id) REFERENCES saves (save_id),

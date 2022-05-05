@@ -35,6 +35,7 @@ async def post_ntfct_body(ntfct_title: str, ntfct_text: str, ntfct_date: str) ->
          values ($1, $2, $3)
         """
     await DB.conn.execute(query, ntfct_title, ntfct_text, ntfct_date)
+    return True
 
 
 async def post_ntfct_for_user(ntfct_id: int, uid: int, ntfct_opened: bool) -> list:
@@ -55,7 +56,7 @@ async def post_ntfct_for_all(list_ntfct_uid: list) -> list:
 
 # __________PuT____________
 
-async def put_ntfct_for_user(ntfct_id: int, username: str) -> list:
+async def put_ntfct_for_user(ntfct_id: int, username: str) -> bool:
     query = f"""
          update notifications_users
          set ntfct_opened = true
@@ -63,3 +64,4 @@ async def put_ntfct_for_user(ntfct_id: int, username: str) -> list:
          and uid = (select uid from users where username = $2)
        """
     await DB.conn.execute(query, ntfct_id, username)
+    return True
