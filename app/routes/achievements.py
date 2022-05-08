@@ -87,7 +87,7 @@ async def new_achievement(request: Request, body: Achievements_New) -> str:
     achv_is_limit = req.get("achv_is_limit")
     achv_date_end_if_limit = req.get("achv_date_end_if_limit")
 
-    if not await post_achievement(achv_name, achv_req, achv_is_limit, achv_date_end_if_limit):
+    if post_achievement(achv_name, achv_req, achv_is_limit, achv_date_end_if_limit) is not None:
         raise HTTPException(status_code=501, detail=f"Write to database failed")
 
     achv_id = get_achievement_id(achv_name, achv_req)
@@ -105,7 +105,7 @@ async def new_process_achievement(request: Request, body: Achievements_Process_N
     if not await get_check_user_by_uid(uid):
         raise HTTPException(status_code=404, detail=f"User with uid {uid} not found")
 
-    if not await post_process_achievement(achv_id, uid, achv_pass):
+    if post_process_achievement(achv_id, uid, achv_pass) is not None:
         raise HTTPException(status_code=501, detail=f"Write to database failed")
 
     return HTTPException(status_code=200, detail=f"OK")
@@ -123,13 +123,10 @@ async def new_complete_achievement(request: Request, body: Achievements_Complete
     if not await get_check_user_by_uid(uid):
         raise HTTPException(status_code=404, detail=f"User with uid {uid} not found")
 
-    if not await post_complete_achievement(achv_id, uid, achv_receive_date):
+    if post_complete_achievement(achv_id, uid, achv_receive_date) is not None:
         raise HTTPException(status_code=501, detail=f"Write to database failed")
 
     return HTTPException(status_code=200, detail=f"OK")
-
-
-# _______________PUT___________
 
 
 @routerAchievements.put("/put")
@@ -143,7 +140,7 @@ async def put_achievement(request: Request, body: Achievements_Put) -> str:
     if not get_check_achievement(achv_id):
         raise HTTPException(status_code=404, detail=f"Achievement with id {achv_id} not found")
 
-    if not await put_achievement(achv_id, achv_name, achv_req, achv_is_limit, achv_date_end_if_limit):
+    if put_achievement(achv_id, achv_name, achv_req, achv_is_limit, achv_date_end_if_limit) is not None:
         raise HTTPException(status_code=501, detail=f"Write to database failed")
 
     return HTTPException(status_code=200, detail=f"OK")
@@ -155,16 +152,10 @@ async def put_achievement(request: Request, body: Achievements_Process_Put) -> s
     achv_id = req.get("achv_id")
     uid = req.get("uid")
     achv_pass = req.get("achv_pass")
-    if not get_check_achievement(achv_id):
-        raise HTTPException(status_code=404, detail=f"Achievement with id {achv_id} not found")
+    if not await get_check_achievement(achv_id) or await get_check_user_by_uid(uid):
+        raise HTTPException(status_code=404, detail=f"Record not found")
 
-    if not await get_check_user_by_uid(uid):
-        raise HTTPException(status_code=404, detail=f"User with uid {uid} not found")
-
-    if not await put_process_achievement(achv_id, uid, achv_pass):
+    if put_process_achievement(achv_id, uid, achv_pass) is not None:
         raise HTTPException(status_code=501, detail=f"Write to database failed")
 
     return HTTPException(status_code=200, detail=f"OK")
-
-
-# _______________DELETE___________

@@ -72,31 +72,23 @@ async def get_lob_usr_id(lob_id: int, lob_is_cap: bool) -> int:
     return await DB.conn.fetchval(query, lob_id, lob_is_cap)
 
 
-# __________POST_________________
-
-
 async def post_lob(lob_is_closed: bool,
                    lob_pass_code: str,
                    lob_name: str,
-                   lob_create_date: str) -> str:
+                   lob_create_date: str):
     query = f"""
          insert into lobbies(lob_is_closed, lob_pass_code, lob_name, lob_create_date, lob_is_full)
          values ($1, $2, $3, $4, false)
        """
     await DB.conn.execute(query, lob_is_closed, lob_pass_code, lob_name, lob_create_date)
-    return f"ok"
 
 
-async def post_lob_usr(uid: int, lob_is_cap: bool, lob_id: int) -> str:
+async def post_lob_usr(uid: int, lob_is_cap: bool, lob_id: int):
     query = f"""
          insert into lobbies_users(uid, lob_is_cap, lob_id)
          values ($1, $2, $3)
        """
     await DB.conn.execute(query, uid, lob_is_cap, lob_id)
-    return f"ok"
-
-
-# __________PUT_________________
 
 
 async def put_lob_fullness(lob_id: int) -> str:
@@ -105,35 +97,29 @@ async def put_lob_fullness(lob_id: int) -> str:
          where lob_id = $1
        """
     await DB.conn.execute(query, lob_id)
-    return f"ok"
 
 
-async def put_lob_usr_role(uid: int, lob_is_cap: bool, lob_id: int) -> str:
+async def put_lob_usr_role(uid: int, lob_is_cap: bool, lob_id: int):
     query = f"""
          update lobbies_users set lob_is_cap = $1
          where uid = $2
          and lob_id = $3
        """
     await DB.conn.execute(query, lob_is_cap, uid, lob_id)
-    return f"ok"
-
-# __________DELETE_________________
 
 
-async def delete_lob_usr(uid: int, lob_id: int) -> str:
+async def delete_lob_usr(uid: int, lob_id: int):
     query = f"""
          delete from lobbies_users 
          where uid = $1
          and lob_id = $2 
        """
     await DB.conn.execute(query, uid, lob_id)
-    return f"ok"
 
 
-async def delete_lob(lob_id: int) -> str:
+async def delete_lob(lob_id: int):
     query = f"""
          delete from lobbies 
          and lob_id = $1 
        """
     await DB.conn.execute(query, lob_id)
-    return f"ok"

@@ -29,7 +29,6 @@ async def reg(request: Request, body: User_Reg) -> str:
         raise HTTPException(status_code=409, detail=f"Email already exists")
 
     if await get_check_username_exist(user_name):
-
         raise HTTPException(status_code=409, detail=f"User already exists")
     hash_pass = await hash_password(user_password)
 
@@ -37,7 +36,7 @@ async def reg(request: Request, body: User_Reg) -> str:
     if len(answer_code) != 4:
         raise HTTPException(status_code=500, detail=f"Bad email sending")
 
-    if not await post_registration_user(user_name, user_email, hash_pass):
+    if await post_registration_user(user_name, user_email, hash_pass) is not None:
         raise HTTPException(status_code=500, detail=f"User has not been registered")
 
     uid = get_uid_by_username(user_name)
@@ -56,7 +55,7 @@ async def auth(request: Request, body: User_Auth) -> str:
 
     db_pass = await get_pass(user_name)
 
-    if await check_password_hash(user_password, db_pass) is False:
+    if not await check_password_hash(user_password, db_pass):
         raise HTTPException(status_code=409, detail=f"Wrong password")
 
     return HTTPException(status_code=200, detail=f"OK")

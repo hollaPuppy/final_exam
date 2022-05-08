@@ -36,8 +36,6 @@ async def lobbies_list() -> UJSONResponse:
     return UJSONResponse({'lobbies': response})
 
 
-# _______________POST___________
-
 @routerLobbies.post("/new")
 async def new_lobby(request: Request, body: Lobbies_New) -> UJSONResponse:
     lob_pass_code = ''
@@ -86,17 +84,19 @@ async def disconnect_from_lobby(request: Request, body: Lobbies_Get_In) -> str:
     await delete_lob_usr(uid, lob_id)
 
     if await get_lob_usr_count(lob_id) == 0:
-        await delete_lob(lob_id)
+        if await delete_lob(lob_id) is not None:
+            raise HTTPException(status_code=501, detail=f"Write to database failed")
         return HTTPException(status_code=200, detail=f"Since the lobby became empty it was removed")
+
     else:
         if cap_flag:
             second_uid = await get_lob_usr_id(lob_id)
-            await put_lob_usr_role(second_uid, true, lob_id)
+
+            if await put_lob_usr_role(second_uid, true, lob_id) is not None:
+                raise HTTPException(status_code=501, detail=f"Write to database failed")
 
     return HTTPException(status_code=200, detail=f"Capitan switched")
 
-
-# _______________PUT___________
 
 @routerLobbies.put("/put/cap")
 async def put_lobby_cap(request: Request, body: Lobbies_Put_Cap) -> str:
@@ -104,7 +104,8 @@ async def put_lobby_cap(request: Request, body: Lobbies_Put_Cap) -> str:
     lob_id = req.get("lob_id")
     cap_uid = await get_lob_usr_id(lob_id, true)
     second_uid = await get_lob_usr_id(lob_id, false)
-    await put_lob_usr_role(cap_uid, false, lob_id)
-    await put_lob_usr_role(second_uid, true, lob_id)
+
+    if await put_lob_usr_role(cap_uid, false, lob_id) or await put_lob_usr_role(second_uid, true, lob_id) is not None:
+        raise HTTPException(status_code=501, detail=f"Write to database failed")
 
     return HTTPException(status_code=200, detail=f"Capitan switched")

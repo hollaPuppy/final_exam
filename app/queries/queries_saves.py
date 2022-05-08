@@ -45,40 +45,31 @@ async def get_complete_puzzles_list(save_record_id: int) -> list:
     return list(map(lambda row: Saves_Complete_Puzs(**row).dict(), await DB.conn.fetch(query, save_record_id)))
 
 
-# __________POST_________________
-
-
-async def post_save_record(username: str, save_name: str) -> bool:
+async def post_save_record(username: str, save_name: str):
     query = f"""
          insert into saves(uid, save_date, save_name)
          values((select uid from users where username = $1), $2, $3) 
        """
     await DB.conn.execute(query, username, datetime.now(), save_name)
-    return True
 
 
-async def post_coords_records(coord_pos: str, coord_rot: str, save_id: int) -> bool:
+async def post_coords_records(coord_pos: str, coord_rot: str, save_id: int):
     query = f"""
          insert into coordinations(coord_pos, coord_rot, save_id) 
          values ($1, $2, $3)
        """
     await DB.conn.execute(query, coord_pos, coord_rot, save_id)
-    return True
 
 
-async def post_puz_records(puz_id_list: list) -> bool:
+async def post_puz_records(puz_id_list: list):
     query = f"""
          insert into complete_puzzles(puz_id, receive_date, save_id) 
          values ($1, $2, $3)
        """
     await DB.conn.executemany(query, puz_id_list)
-    return True
 
 
-# __________Put_________________
-
-
-async def update_coords_records(coord_pos: str, coord_rot: str, save_id: int) -> bool:
+async def update_coords_records(coord_pos: str, coord_rot: str, save_id: int):
     query = f"""
          update coordinations 
          set coord_pos = $1,
@@ -86,4 +77,3 @@ async def update_coords_records(coord_pos: str, coord_rot: str, save_id: int) ->
          where save_id = $3
         """
     await DB.conn.execute(query, coord_pos, coord_rot, save_id)
-    return True

@@ -42,9 +42,6 @@ async def saves_list(request: Request, body: Saves_Full_Info) -> UJSONResponse:
     return UJSONResponse({"coords": response_coords, "complete_puzzles": com_puz_str})
 
 
-# _______________POST___________
-
-
 @routerSave.post("/new")
 async def set_save(request: Request, body: Saves_Set_New) -> str:
     req: dict = await request.json()
@@ -53,25 +50,18 @@ async def set_save(request: Request, body: Saves_Set_New) -> str:
     coord_pos = req.get("coord_pos")
     coord_rot = req.get("coord_rot")
     puz_id_list = req.get("puz_id_list")
-    if not post_save_record(username, save_name):
+    if await post_save_record(username, save_name) is not None:
         raise HTTPException(status_code=501, detail=f"Write to database failed")
 
     save_record_id = await get_save_record_id(username, save_name)
     if not save_record_id:
         raise HTTPException(status_code=404, detail=f"Save {save_name} for {username} not found")
-
     puz_id_list = await create_puz_id_list(int(save_record_id), puz_id_list)
 
-    if not await post_puz_records(puz_id_list):
-        raise HTTPException(status_code=501, detail=f"Write to database failed")
-
-    if not await post_coords_records(coord_pos, coord_rot, int(save_record_id)):
+    if await post_puz_records(puz_id_list) or await post_coords_records(coord_pos, coord_rot, int(save_record_id)) is not None:
         raise HTTPException(status_code=501, detail=f"Write to database failed")
 
     return HTTPException(status_code=200, detail=f"OK")
-
-
-# _______________PUT___________
 
 
 @routerSave.post("/put")
@@ -88,10 +78,7 @@ async def set_save(request: Request, body: Saves_Set_New) -> str:
         raise HTTPException(status_code=404, detail=f"Save {save_name} for {username} not found")
     puz_id_list = await create_puz_id_list(int(save_record_id), puz_id_list)
 
-    if not await post_puz_records(puz_id_list):
-        raise HTTPException(status_code=501, detail=f"Write to database failed")
-
-    if not await update_coords_records(coord_pos, coord_rot, int(save_record_id)):
+    if await post_puz_records(puz_id_list) or await update_coords_records(coord_pos, coord_rot, int(save_record_id)) is not None:
         raise HTTPException(status_code=501, detail=f"Write to database failed")
 
     return HTTPException(status_code=200, detail=f"OK")

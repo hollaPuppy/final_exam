@@ -61,16 +61,12 @@ async def get_uid_by_username(username: str) -> list:
     return await DB.conn.fetchval(query, username)
 
 
-# ____________POST______________
-
-
 async def post_registration_user(username: str, email: str, hash_pass: dict) -> bool:
     query = f"""
          insert into users(user_name, user_email, user_hash_pass)
          values($1, $2, $3)
        """
     await DB.conn.execute(query, username, email, ujson.dumps(hash_pass))
-    return True
 
 
 

@@ -90,13 +90,11 @@ async def get_process_achievements_by_username(username: str) -> list:
        """
     return list(map(lambda row: Achievements_Process_List_Get(**row).dict(), await DB.conn.fetch(query, username)))
 
-# __________POST_________________
-
 
 async def post_achievement(achv_name: str,
                            achv_req: int,
                            achv_is_limit: Optional[bool],
-                           achv_date_end_if_limit: Optional[str]) -> bool:
+                           achv_date_end_if_limit: Optional[str]):
     query = f"""
          insert into achievements_list(achv_name, achv_req, achv_is_limit, achv_date_end_if_limit)
          values ($1, $2, $3, $4)
@@ -106,35 +104,29 @@ async def post_achievement(achv_name: str,
                           achv_req,
                           achv_is_limit,
                           achv_date_end_if_limit)
-    return True
 
 
-async def post_process_achievement(achv_id: int, uid: int, achv_pass: int) -> bool:
+async def post_process_achievement(achv_id: int, uid: int, achv_pass: int):
     query = f"""
          insert into process_achievements(achv_id, uid, achv_pass)
          values ($1, $2, $3)
        """
     await DB.conn.execute(query, achv_id, uid, achv_pass)
-    return True
 
 
-async def post_complete_achievement(achv_id: int, uid: int, achv_receive_date: str) -> bool:
+async def post_complete_achievement(achv_id: int, uid: int, achv_receive_date: str):
     query = f"""
          insert into complete_achievements(achv_id, uid, achv_receive_date)
          values ($1, $2, $3)
        """
     await DB.conn.execute(query, achv_id, uid, achv_receive_date)
-    return True
-
-
-# __________Put_________________
 
 
 async def put_achievement(achv_id: int,
                           achv_name: str,
                           achv_req: int,
                           achv_is_limit: Optional[bool],
-                          achv_date_end_if_limit: Optional[str]) -> bool:
+                          achv_date_end_if_limit: Optional[str]):
     query = f"""
          update achievements_list 
          set achv_name = $1, 
@@ -149,20 +141,13 @@ async def put_achievement(achv_id: int,
                           achv_is_limit,
                           achv_date_end_if_limit,
                           achv_id)
-    return True
 
 
-async def put_process_achievement(achv_id: int,
-                                  uid: str,
-                                  achv_pass: int) -> bool:
+async def put_process_achievement(achv_id: int, uid: str, achv_pass: int):
     query = f"""
          update process_achievements
          set achv_pass = $1
          where achv_id = $2
          and uid = $3
        """
-    await DB.conn.execute(query,
-                          achv_pass,
-                          achv_id,
-                          uid)
-    return True
+    await DB.conn.execute(query, achv_pass, achv_id, uid)
