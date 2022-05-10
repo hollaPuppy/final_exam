@@ -1,18 +1,8 @@
-FROM tiangolo/uvicorn-gunicorn:python3.9
+FROM python:3.9-alpine
 
-ENV PYTHONUNBUFFERED 1
-ENV PYTHONPATH /usr/local/lib/python3.8/
+WORKDIR /app
+ADD requirements.txt .
 
-ENV APP_ROOT /app
+RUN pip install --trusted-host pypi.python.org -r requirements.txt
 
-RUN mkdir ${APP_ROOT};
-
-WORKDIR ${APP_ROOT}
-
-COPY ./requirements.txt /config/requirements.txt
-
-RUN pip install --no-cache-dir --upgrade -r /config/requirements.txt
-
-ADD app ${APP_ROOT}
-
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8087"]
+CMD [ "uvicorn", "main:app", "--reload", "--host", "0.0.0.0", "--port", "8000" ]

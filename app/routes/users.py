@@ -21,9 +21,9 @@ routerUser = APIRouter(
 @routerUser.post("/registration")
 async def reg(request: Request, body: User_Reg) -> str:
     req: dict = await request.json()
-    user_name = req.get("username")
-    user_email = req.get("email")
-    user_password = req.get("password")
+    user_name = req.get("user_name")
+    user_email = req.get("user_email")
+    user_password = req.get("user_password")
 
     if await get_check_email_exist(user_email):
         raise HTTPException(status_code=409, detail=f"Email already exists")

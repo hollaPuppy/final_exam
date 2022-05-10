@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from app.routes import users, achievements, saves, lobbies, notifications
+from app.routes import users, achievements, saves, lobbies, notifications, chat
 import sqlalchemy
 from .db import DB
 
@@ -11,6 +11,7 @@ app.include_router(achievements.routerAchievements)
 app.include_router(saves.routerSave)
 app.include_router(lobbies.routerLobbies)
 app.include_router(notifications.routerNotifications)
+app.include_router(chat.routerChat)
 
 
 @app.on_event("startup")
