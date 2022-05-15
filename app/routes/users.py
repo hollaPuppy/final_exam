@@ -19,7 +19,7 @@ routerUser = APIRouter(
 
 
 @routerUser.post("/registration")
-async def reg(request: Request, body: User_Reg) -> str:
+async def reg(request: Request, body: User_Reg) -> UJSONResponse:
     req: dict = await request.json()
     user_name = req.get("user_name")
     user_email = req.get("user_email")
@@ -39,7 +39,7 @@ async def reg(request: Request, body: User_Reg) -> str:
     if await post_registration_user(user_name, user_email, hash_pass) is not None:
         raise HTTPException(status_code=500, detail=f"User has not been registered")
 
-    uid = get_uid_by_username(user_name)
+    uid = await get_uid_by_username(user_name)
 
     return UJSONResponse({'code': answer_code, 'uid': uid})
 
