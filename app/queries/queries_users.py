@@ -4,7 +4,7 @@ from datetime import datetime
 from app.routes.schemas.users import User_Uid_List
 
 
-async def get_check_email_exist(email: str) -> str:
+async def get_check_email_exist(email: str) -> bool:
     query = f"""
          select exists (
          select
@@ -23,7 +23,7 @@ async def get_pass(username: str) -> str:
     return await DB.conn.fetchval(query, username)
 
 
-async def get_check_username_exist(username: str) -> str:
+async def get_check_username_exist(username: str) -> bool:
     query = f"""
          select exists (
          select
@@ -42,7 +42,7 @@ async def get_uid_list() -> list:
     return list(map(lambda row: User_Uid_List(**row).dict(), result_list))
 
 
-async def get_check_user_by_uid(uid: int) -> list:
+async def get_check_user_by_uid(uid: int) -> bool:
     query = f"""
          select exists (
          select
@@ -52,13 +52,22 @@ async def get_check_user_by_uid(uid: int) -> list:
     return await DB.conn.fetchval(query, uid)
 
 
-async def get_uid_by_username(username: str) -> list:
+async def get_uid_by_username(username: str) -> str:
     query = f"""
          select uid
          from users
          where user_name = $1
        """
     return await DB.conn.fetchval(query, username)
+
+
+async def get_username_by_uid(uid: int) -> str:
+    query = f"""
+         select user_name
+         from users
+         where uid = $1
+       """
+    return await DB.conn.fetchval(query, uid)
 
 
 async def post_registration_user(username: str, email: str, hash_pass: dict) -> bool:
