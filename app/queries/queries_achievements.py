@@ -48,7 +48,7 @@ async def get_limit_achievements_list() -> list:
 
 async def get_complete_achievements_list() -> list:
     query = f"""
-         select al.achv_id, al.achv_name, u.username, ca.achv_receive_date 
+         select al.achv_id, al.achv_name, u.user_name, ca.achv_receive_date 
          from complete_achievements ca 
          join users u on u.uid = ca.uid 
          join achievements_list al on al.achv_id = ca.achv_id
@@ -57,16 +57,16 @@ async def get_complete_achievements_list() -> list:
     return list(map(lambda row: Achievements_Complete_List_Get(**row).dict(), await DB.conn.fetch(query)))
 
 
-async def get_complete_achievements_by_username(username: str) -> list:
+async def get_complete_achievements_by_username(user_name: str) -> list:
     query = f"""
-         select al.achv_id, al.achv_name, u.username, ca.achv_receive_date
+         select al.achv_id, al.achv_name, u.user_name, ca.achv_receive_date
          from complete_achievements ca 
          join users u on u.uid = ca.uid 
          join achievements_list al on al.achv_id = ca.achv_id
-         where u.username=$1
+         where u.user_name=$1
          order by ca.achv_receive_date 
        """
-    return list(map(lambda row: Achievements_Complete_List_Get(**row).dict(), await DB.conn.fetch(query, username)))
+    return list(map(lambda row: Achievements_Complete_List_Get(**row).dict(), await DB.conn.fetch(query, user_name)))
 
 
 async def get_process_achievements_list() -> list:
@@ -79,16 +79,17 @@ async def get_process_achievements_list() -> list:
     return list(map(lambda row: Achievements_Process_List_Get(**row).dict(), await DB.conn.fetch(query)))
 
 
-async def get_process_achievements_by_username(username: str) -> list:
+async def get_process_achievements_by_username(user_name: str) -> list:
     query = f"""
-         select al.achv_id, al.achv_name, al.achv_req, pa.achv_pass, al.achv_date_end_if_limit 
+         select u.user_name, al.achv_id, al.achv_name, 
+         al.achv_req, pa.achv_pass, al.achv_is_limit, al.achv_date_end_if_limit 
          from process_achievements pa 
          join users u on u.uid = pa.uid
          join achievements_list al on al.achv_id = pa.achv_id
-         where u.username=$1
+         where u.user_name=$1
          order by al.achv_date_end_if_limit
        """
-    return list(map(lambda row: Achievements_Process_List_Get(**row).dict(), await DB.conn.fetch(query, username)))
+    return list(map(lambda row: Achievements_Process_List_Get(**row).dict(), await DB.conn.fetch(query, user_name)))
 
 
 async def post_achievement(achv_name: str,

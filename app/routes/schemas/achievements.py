@@ -21,14 +21,14 @@ class Achievements_Limit_List_Get(BaseModel):
 class Achievements_Complete_List_Get(BaseModel):
     achv_id: int
     achv_name: str
-    username: str
+    user_name: str
     achv_receive_date: str
 
 
 class Achievements_Process_List_Get(BaseModel):
+    user_name: str
     achv_id: int
     achv_name: str
-    username: str
     achv_req: str
     achv_pass: str
     achv_is_limit: Optional[bool]

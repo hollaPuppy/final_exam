@@ -17,3 +17,8 @@ class User_Auth(BaseModel):
 class User_Uid_List(BaseModel):
     uid: int
 
+
+class User_Info(BaseModel):
+    user_name: str
+    user_email: str = EMAIL_EXAMPLE
+    user_active_time: str

@@ -1,5 +1,6 @@
 from fastapi import APIRouter, \
-                    Request
+                    Request, \
+                    HTTPException
 from fastapi.responses import UJSONResponse
 from datetime import datetime
 from .schemas.notifications import Notifications_List, \
@@ -28,14 +29,14 @@ async def notifications_list(username: str) -> UJSONResponse:
     return UJSONResponse({'notifications': response})
 
 
-@routerNotifications.post("/new/{username}")
-async def notifications_post(username: str, request: Request, body: Notifications_Post_New) -> str:
+@routerNotifications.post("/new/{user_name}")
+async def notifications_post(user_name: str, request: Request, body: Notifications_Post_New) -> HTTPException:
     req: dict = await request.json()
     ntfct_title = req.get("ntfct_title")
     ntfct_text = req.get("ntfct_text")
     ntfct_date = req.get("ntfct_date")
-    if not await get_check_username_exist(username):
-        raise HTTPException(status_code=404, detail=f"User {username} not found")
+    if not await get_check_username_exist(user_name):
+        raise HTTPException(status_code=404, detail=f"User {user_name} not found")
 
     if ntfct_date == "":
         ntfct_date = datetime.now()
@@ -45,21 +46,21 @@ async def notifications_post(username: str, request: Request, body: Notification
 
     ntfct_id = await get_ntfct_id_by_title_text_date(ntfct_title, ntfct_text, ntfct_date)
 
-    if not await get_list_uids_and_ntfct(ntfct_id, username):
+    if not await get_list_uids_and_ntfct(ntfct_id, user_name):
         raise HTTPException(status_code=501, detail=f"Write to database failed")
-
+    # кринж все переделать
     return HTTPException(status_code=200, detail=f"{ntfct_id}")
 
 
-@routerNotifications.put("/open/{username}")
-async def notifications_post(username: str, body: Notifications_Put_Opened) -> str:
+@routerNotifications.put("/open/")
+async def notifications_post(request: Request, body: Notifications_Put_Opened) -> HTTPException:
     req: dict = await request.json()
     ntfct_id = req.get("ntfct_id")
-    username = req.get("username")
-    if not await get_check_username_exist(username):
-        raise HTTPException(status_code=404, detail=f"User {username} not found")
+    user_name = req.get("user_name")
+    if not await get_check_username_exist(user_name):
+        raise HTTPException(status_code=404, detail=f"User {user_name} not found")
 
-    if await put_ntfct_for_user(ntfct_id, username) is not None:
+    if await put_ntfct_for_user(ntfct_id, user_name) is not None:
         raise HTTPException(status_code=501, detail=f"Write to database failed")
 
     return HTTPException(status_code=200, detail=f"OK")

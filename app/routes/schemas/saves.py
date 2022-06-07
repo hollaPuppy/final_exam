@@ -4,7 +4,7 @@ from pydantic import BaseModel
 
 
 class Saves_Set_New(BaseModel):
-    username: str
+    user_name: str
     save_name: str
     coord_pos: str
     coord_rot: str
@@ -17,7 +17,7 @@ class Saves_List_By_Username(BaseModel):
 
 
 class Saves_Full_Info(BaseModel):
-    username: str
+    user_name: str
     save_name: str
 
 

@@ -1,17 +1,22 @@
+from typing import Type
+
 from fastapi import APIRouter, \
-                    Request, \
-                    HTTPException
+    Request, \
+    HTTPException
 from fastapi.responses import UJSONResponse
 from ..utils.users import hash_password, \
-                          send_confirm_letter, \
-                          check_password_hash
-from ..queries.queries_users import get_check_email_exist, \
-                                    get_check_username_exist, \
-                                    get_pass, \
-                                    get_uid_by_username, \
-                                    post_registration_user
+    send_confirm_letter, \
+    check_password_hash
+from ..queries.queries_users import get_check_uid_exist, \
+    get_user_info_by_uid, \
+    get_check_email_exist, \
+    get_check_username_exist, \
+    get_pass, \
+    get_uid_by_username, \
+    post_registration_user
 from .schemas.users import User_Reg, \
-                           User_Auth
+    User_Auth
+
 routerUser = APIRouter(
     prefix='/users',
     tags=['users']
@@ -45,13 +50,13 @@ async def reg(request: Request, body: User_Reg) -> UJSONResponse:
 
 
 @routerUser.get("/auth")
-async def auth(request: Request, body: User_Auth) -> str:
+async def auth(request: Request, body: User_Auth) -> HTTPException:
     req: dict = await request.json()
-    user_name = req.get("username")
-    user_password = req.get("password")
+    user_name = req.get("user_name")
+    user_password = req.get("user_password")
 
     if not await get_check_username_exist(user_name):
-        raise HTTPException(status_code=404, detail=f"User {username} not found")
+        raise HTTPException(status_code=404, detail=f"User {user_name} not found")
 
     db_pass = await get_pass(user_name)
 
@@ -61,4 +66,23 @@ async def auth(request: Request, body: User_Auth) -> str:
     return HTTPException(status_code=200, detail=f"OK")
 
 
+@routerUser.get("/profile/{uid}")
+async def profile(uid: int) -> HTTPException:
+    if not await get_check_uid_exist(uid):
+        raise HTTPException(status_code=404, detail=f"User with uid {uid} not found")
 
+    await get_user_info_by_uid(uid)
+
+    return HTTPException(status_code=200, detail=f"OK")
+
+
+@routerUser.get("/top_players/{category}")
+async def profile(category: str) -> UJSONResponse:
+    if category == "achv":
+        return UJSONResponse({'info': 'cool'})
+    if category == "active_time":
+        return UJSONResponse({'info': 'wow'})
+    else:
+        return UJSONResponse({'info': 'taheck category'})
+
+    # return UJSONResponse({'achieves': 'wow'})

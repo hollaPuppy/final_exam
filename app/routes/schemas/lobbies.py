@@ -26,3 +26,4 @@ class Lobbies_Get_Out(BaseModel):
 
 class Lobbies_Put_Cap(BaseModel):
     lob_id: int
+    

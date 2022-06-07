@@ -8,6 +8,7 @@ from ..queries.queries_achievements import get_check_achievement, \
                                            get_complete_achievements_list, \
                                            get_complete_achievements_by_username, \
                                            get_process_achievements_by_username, \
+                                           get_process_achievements_list, \
                                            get_achievement_id, \
                                            post_achievement, \
                                            post_process_achievement, \
@@ -46,32 +47,32 @@ async def limit_achievements_list() -> UJSONResponse:
     return UJSONResponse({'limit_achieves': response})
 
 
-@routerAchievements.get("/complete/{username}")
-async def complete_achievements_list(username: str) -> UJSONResponse:
-    if username == 'all':
+@routerAchievements.get("/complete/{user_name}")
+async def complete_achievements_list(user_name: str) -> UJSONResponse:
+    if user_name == 'all':
         response = await get_complete_achievements_list()
     else:
-        if not await get_check_username_exist(username):
-            raise HTTPException(status_code=404, detail=f"User {username} not found")
+        if not await get_check_username_exist(user_name):
+            raise HTTPException(status_code=404, detail=f"User {user_name} not found")
 
-        response = await get_complete_achievements_by_username(username)
+        response = await get_complete_achievements_by_username(user_name)
         if not response:
-            raise HTTPException(status_code=404, detail=f"Complete achievements for {username} not found")
+            raise HTTPException(status_code=404, detail=f"Complete achievements for {user_name} not found")
 
     return UJSONResponse({'complete_achieves': response})
 
 
-@routerAchievements.get("/process/{username}")
-async def process_achievements_list(username: str) -> UJSONResponse:
-    if username == 'all':
+@routerAchievements.get("/process/{user_name}")
+async def process_achievements_list(user_name: str) -> UJSONResponse:
+    if user_name == 'all':
         response = await get_process_achievements_list()
     else:
-        if not await get_check_username_exist(username):
-            raise HTTPException(status_code=404, detail=f"User {username} not found")
+        if not await get_check_username_exist(user_name):
+            raise HTTPException(status_code=404, detail=f"User {user_name} not found")
 
-        response = await get_process_achievements_by_username(username)
+        response = await get_process_achievements_by_username(user_name)
         if not response:
-            raise HTTPException(status_code=404, detail=f"Process achievements for {username} not found")
+            raise HTTPException(status_code=404, detail=f"Process achievements for {user_name} not found")
 
     return UJSONResponse({'process_achieves': response})
 
@@ -80,7 +81,7 @@ async def process_achievements_list(username: str) -> UJSONResponse:
 
 
 @routerAchievements.post("/new")
-async def new_achievement(request: Request, body: Achievements_New) -> str:
+async def new_achievement(request: Request, body: Achievements_New) -> HTTPException:
     req: dict = await request.json()
     achv_name = req.get("achv_name")
     achv_req = req.get("achv_req")
@@ -96,7 +97,7 @@ async def new_achievement(request: Request, body: Achievements_New) -> str:
 
 
 @routerAchievements.post("/process/new")
-async def new_process_achievement(request: Request, body: Achievements_Process_New) -> str:
+async def new_process_achievement(request: Request, body: Achievements_Process_New) -> HTTPException:
     req: dict = await request.json()
     achv_id = req.get("achv_id")
     uid = req.get("uid")
@@ -112,7 +113,7 @@ async def new_process_achievement(request: Request, body: Achievements_Process_N
 
 
 @routerAchievements.post("/complete/new")
-async def new_complete_achievement(request: Request, body: Achievements_Complete_New) -> str:
+async def new_complete_achievement(request: Request, body: Achievements_Complete_New) -> HTTPException:
     req: dict = await request.json()
     achv_id = req.get("achv_id")
     uid = req.get("uid")
@@ -130,7 +131,7 @@ async def new_complete_achievement(request: Request, body: Achievements_Complete
 
 
 @routerAchievements.put("/put")
-async def put_achievement(request: Request, body: Achievements_Put) -> str:
+async def put_achievement(request: Request, body: Achievements_Put) -> HTTPException:
     req: dict = await request.json()
     achv_id = req.get("achv_id")
     achv_name = req.get("achv_name")
@@ -147,7 +148,7 @@ async def put_achievement(request: Request, body: Achievements_Put) -> str:
 
 
 @routerAchievements.put("/process/put")
-async def put_achievement(request: Request, body: Achievements_Process_Put) -> str:
+async def put_achievement(request: Request, body: Achievements_Process_Put) -> HTTPException:
     req: dict = await request.json()
     achv_id = req.get("achv_id")
     uid = req.get("uid")

@@ -59,7 +59,7 @@ async def get_lob_usr_count(lob_id: int) -> int:
          from lobbies_users
          and lob_id = $1
        """
-    return await DB.conn.fetchval(query, uid)
+    return await DB.conn.fetchval(query, lob_id)
 
 
 async def get_lob_usr_id(lob_id: int, lob_is_cap: bool) -> int:
@@ -91,7 +91,7 @@ async def post_lob_usr(uid: int, lob_is_cap: bool, lob_id: int):
     await DB.conn.execute(query, uid, lob_is_cap, lob_id)
 
 
-async def put_lob_fullness(lob_id: int) -> str:
+async def put_lob_fullness(lob_id: int) -> None:
     query = f"""
          update lobbies set lob_is_full = true
          where lob_id = $1
@@ -99,7 +99,7 @@ async def put_lob_fullness(lob_id: int) -> str:
     await DB.conn.execute(query, lob_id)
 
 
-async def put_lob_usr_role(uid: int, lob_is_cap: bool, lob_id: int):
+async def put_lob_usr_role(uid: int, lob_is_cap: bool, lob_id: int) -> None:
     query = f"""
          update lobbies_users set lob_is_cap = $1
          where uid = $2

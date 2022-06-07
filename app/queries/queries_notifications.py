@@ -3,15 +3,15 @@ from app.db import DB
 from app.routes.schemas.notifications import Notifications_List
 
 
-async def get_ntfct_list_by_username(username: str) -> list:
+async def get_ntfct_list_by_username(user_name: str) -> list:
     query = f"""
          select n.ntfct_title, n.ntfct_text, n.ntfct_date, nu.ntfct_opened
          from notifications n
          join notifications_users nu on nu.ntfct_id=n.ntfct_id
-         where nu.uid=(select uid from users where username = $1)
+         where nu.uid=(select uid from users where user_name = $1)
          order by n.ntfct_date
        """
-    result_list = await DB.conn.fetch(query, username)
+    result_list = await DB.conn.fetch(query, user_name)
     return list(map(lambda row: Notifications_List(**row).dict(), result_list))
 
 
@@ -50,11 +50,11 @@ async def post_ntfct_for_all(list_ntfct_uid: list):
     await DB.conn.executemany(query, list_ntfct_uid)
 
 
-async def put_ntfct_for_user(ntfct_id: int, username: str):
+async def put_ntfct_for_user(ntfct_id: int, user_name: str):
     query = f"""
          update notifications_users
          set ntfct_opened = true
          where ntfct_id = $1
-         and uid = (select uid from users where username = $2)
+         and uid = (select uid from users where user_name = $2)
        """
-    await DB.conn.execute(query, ntfct_id, username)
+    await DB.conn.execute(query, ntfct_id, user_name)

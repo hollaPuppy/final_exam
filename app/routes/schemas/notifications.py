@@ -17,4 +17,4 @@ class Notifications_Post_New(BaseModel):
 
 class Notifications_Put_Opened(BaseModel):
     ntfct_id: int
-    username: str
+    user_name: str
