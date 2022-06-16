@@ -1,21 +1,26 @@
-from typing import Type
-
 from fastapi import APIRouter, \
-    Request, \
-    HTTPException
+                    Request, \
+                    HTTPException
 from fastapi.responses import UJSONResponse
 from ..utils.users import hash_password, \
-    send_confirm_letter, \
-    check_password_hash
-from ..queries.queries_users import get_check_uid_exist, \
-    get_user_info_by_uid, \
-    get_check_email_exist, \
-    get_check_username_exist, \
-    get_pass, \
-    get_uid_by_username, \
-    post_registration_user
+                          send_confirm_letter, \
+                          check_password_hash
+from ..queries.queries_users import get_uid_check_exist, \
+                                    get_user_info_by_uid, \
+                                    get_user_email_by_uid, \
+                                    get_user_name_by_uid, \
+                                    get_email_check_exist, \
+                                    get_user_name_check_exist, \
+                                    get_user_password, \
+                                    get_uid_by_username, \
+                                    get_user_list_by_active_time, \
+                                    post_user_registration, \
+                                    put_user_active_time, \
+                                    put_user_info
 from .schemas.users import User_Reg, \
-    User_Auth
+                           User_Auth, \
+                           User_Active_Time_Put, \
+                           User_Info_Put
 
 routerUser = APIRouter(
     prefix='/users',
@@ -30,23 +35,27 @@ async def reg(request: Request, body: User_Reg) -> UJSONResponse:
     user_email = req.get("user_email")
     user_password = req.get("user_password")
 
-    if await get_check_email_exist(user_email):
+    if await get_email_check_exist(user_email):
         raise HTTPException(status_code=409, detail=f"Email already exists")
 
-    if await get_check_username_exist(user_name):
+    if await get_user_name_check_exist(user_name):
         raise HTTPException(status_code=409, detail=f"User already exists")
     hash_pass = await hash_password(user_password)
 
-    answer_code = await send_confirm_letter(user_email)
-    if len(answer_code) != 4:
-        raise HTTPException(status_code=500, detail=f"Bad email sending")
+    if len(user_password) < 8:
+        raise HTTPException(status_code=409, detail=f"Password is too short")
 
-    if await post_registration_user(user_name, user_email, hash_pass) is not None:
+    # answer_code_or_ex = await send_confirm_letter(user_email)
+    # if len(answer_code_or_ex) != 4:
+    #     raise HTTPException(status_code=500, detail=f"Bad email sending with {answer_code_or_ex}")
+    # больше не работает...............
+
+    if await post_user_registration(user_name, user_email, hash_pass) is not None:
         raise HTTPException(status_code=500, detail=f"User has not been registered")
 
     uid = await get_uid_by_username(user_name)
 
-    return UJSONResponse({'code': answer_code, 'uid': uid})
+    return UJSONResponse({'uid': uid})
 
 
 @routerUser.get("/auth")
@@ -55,7 +64,7 @@ async def auth(request: Request, body: User_Auth) -> HTTPException:
     user_name = req.get("user_name")
     user_password = req.get("user_password")
 
-    if not await get_check_username_exist(user_name):
+    if not await get_user_name_check_exist(user_name):
         raise HTTPException(status_code=404, detail=f"User {user_name} not found")
 
     db_pass = await get_pass(user_name)
@@ -68,21 +77,56 @@ async def auth(request: Request, body: User_Auth) -> HTTPException:
 
 @routerUser.get("/profile/{uid}")
 async def profile(uid: int) -> HTTPException:
-    if not await get_check_uid_exist(uid):
+    if not await get_uid_check_exist(uid):
         raise HTTPException(status_code=404, detail=f"User with uid {uid} not found")
 
-    await get_user_info_by_uid(uid)
+    user_info = await get_user_info_by_uid(uid)
 
-    return HTTPException(status_code=200, detail=f"OK")
+    return UJSONResponse({'profile': user_info})
 
 
 @routerUser.get("/top_players/{category}")
-async def profile(category: str) -> UJSONResponse:
+async def top(category: str) -> UJSONResponse:
     if category == "achv":
         return UJSONResponse({'info': 'cool'})
     if category == "active_time":
-        return UJSONResponse({'info': 'wow'})
+        return UJSONResponse({'info': await get_user_list_by_active_time()})
     else:
         return UJSONResponse({'info': 'taheck category'})
 
-    # return UJSONResponse({'achieves': 'wow'})
+
+@routerUser.put("/put_active_time")
+async def put_time(request: Request, body: User_Active_Time_Put) -> HTTPException:
+    req: dict = await request.json()
+    uid = req.get("uid")
+    user_active_time = req.get("user_active_time")
+    if not await get_uid_check_exist(uid):
+        raise HTTPException(status_code=404, detail=f"User with uid {uid} not found")
+
+    if await put_user_active_time(uid, user_active_time):
+        raise HTTPException(status_code=500, detail=f"Active time dont set")
+
+    raise HTTPException(status_code=200, detail=f"OK")
+
+
+@routerUser.put("/put/profile/{uid}")
+async def put_profile(request: Request, uid: int, body: User_Info_Put) -> HTTPException:
+    req: dict = await request.json()
+    user_name = req.get("user_name")
+    user_email = req.get("user_email")
+    if not await get_uid_check_exist(uid):
+        raise HTTPException(status_code=404, detail=f"User with uid {uid} not found")
+
+    if user_name and user_name is None:
+        raise HTTPException(status_code=400, detail=f"Nothing to update")
+
+    if not user_name:
+        user_name = await get_user_name_by_uid(uid)
+
+    if not user_email:
+        user_email = await get_user_email_by_uid(uid)
+
+    if await put_user_info(uid, user_name, user_email):
+        raise HTTPException(status_code=404, detail=f"Profile dont update")
+
+    raise HTTPException(status_code=200, detail=f"OK")

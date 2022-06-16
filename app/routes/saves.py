@@ -9,7 +9,7 @@ from ..queries.queries_saves import get_saves_by_username, \
                                     post_puz_records, \
                                     post_coords_records, \
                                     post_save_record, \
-                                    update_coords_records
+                                    put_coords_records
 from .schemas.saves import Saves_Set_New, \
                            Saves_Full_Info
 from ..utils.saves import create_puz_id_list
@@ -81,7 +81,7 @@ async def set_save(request: Request, body: Saves_Set_New) -> HTTPException:
     puz_id_list = create_puz_id_list(int(save_record_id), puz_id_list)
 
     if await post_puz_records(puz_id_list) \
-            or await update_coords_records(coord_pos, coord_rot, int(save_record_id)) is not None:
+            or await put_coords_records(coord_pos, coord_rot, int(save_record_id)) is not None:
         raise HTTPException(status_code=501, detail=f"Write to database failed")
 
     return HTTPException(status_code=200, detail=f"OK")

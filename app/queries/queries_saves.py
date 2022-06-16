@@ -69,7 +69,7 @@ async def post_puz_records(puz_id_list: list):
     await DB.conn.executemany(query, puz_id_list)
 
 
-async def update_coords_records(coord_pos: str, coord_rot: str, save_id: int):
+async def put_coords_records(coord_pos: str, coord_rot: str, save_id: int):
     query = f"""
          update coordinations 
          set coord_pos = $1,

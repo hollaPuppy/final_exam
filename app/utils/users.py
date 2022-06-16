@@ -39,3 +39,17 @@ async def send_confirm_letter(email: str) -> str:
         return f"{_ex}\n Check account data pls"
 
     return conf_code
+
+
+async def parse_active_time(profile_list: dict):
+    raw_active_time = int(profile_list.get('user_active_time'))
+    dict_time = {'hours': 0, 'minutes': 0, 'seconds': 0}
+    if raw_active_time >= 60:
+        if raw_active_time >= 3600:
+            dict_time['hours'] = raw_active_time // 3600
+            raw_active_time = raw_active_time % 3600
+        dict_time['minutes'] = raw_active_time // 60
+        dict_time['seconds'] = raw_active_time % 60
+    profile_list['user_active_time'] = dict_time
+
+    return profile_list

@@ -10,7 +10,7 @@ from ..queries.queries_notifications import get_ntfct_list_by_username, \
                                             get_ntfct_id_by_title_text_date, \
                                             post_ntfct_body, \
                                             put_ntfct_for_user
-from ..queries.queries_users import get_check_username_exist
+from ..queries.queries_users import get_user_name_check_exist
 from ..utils.notifications import get_list_uids_and_ntfct
 
 

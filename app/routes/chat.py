@@ -1,7 +1,7 @@
 from fastapi import APIRouter, \
                     WebSocket
 from ..utils.sockets import SocketManager
-from ..queries.queries_users import get_username_by_uid
+from ..queries.queries_users import get_uid_by_username
 routerChat = APIRouter(
     prefix='/chat',
     tags=['chat']

@@ -15,8 +15,8 @@ from ..queries.queries_achievements import get_check_achievement, \
                                            post_complete_achievement, \
                                            put_achievement, \
                                            put_process_achievement
-from ..queries.queries_users import get_check_username_exist, \
-                                    get_check_user_by_uid
+from ..queries.queries_users import get_user_name_check_exist, \
+                                    get_user_by_uid_check
 from .schemas.achievements import Achievements_New, \
                                   Achievements_Process_New, \
                                   Achievements_Complete_New, \
@@ -44,6 +44,7 @@ async def limit_achievements_list() -> UJSONResponse:
     response = await get_limit_achievements_list()
     if not response:
         raise HTTPException(status_code=404, detail=f"Limit achievements not found")
+
     return UJSONResponse({'limit_achieves': response})
 
 
@@ -52,7 +53,7 @@ async def complete_achievements_list(user_name: str) -> UJSONResponse:
     if user_name == 'all':
         response = await get_complete_achievements_list()
     else:
-        if not await get_check_username_exist(user_name):
+        if not await get_user_name_check_exist(user_name):
             raise HTTPException(status_code=404, detail=f"User {user_name} not found")
 
         response = await get_complete_achievements_by_username(user_name)
@@ -67,7 +68,7 @@ async def process_achievements_list(user_name: str) -> UJSONResponse:
     if user_name == 'all':
         response = await get_process_achievements_list()
     else:
-        if not await get_check_username_exist(user_name):
+        if not await get_user_name_check_exist(user_name):
             raise HTTPException(status_code=404, detail=f"User {user_name} not found")
 
         response = await get_process_achievements_by_username(user_name)
