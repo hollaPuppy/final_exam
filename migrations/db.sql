@@ -7,9 +7,9 @@ CREATE TABLE achievements_list (
   PRIMARY KEY (achv_id)
 );
 
-CREATE TABLE bd_options (
+CREATE TABLE db_options (
   option_id integer NOT NULL,
-  option_name varchar(255) DEFAULT NULL,
+  option_name varchar(255) NOT NULL,
   option_value varchar(255) NOT NULL,
   PRIMARY KEY (option_id)
 );
@@ -40,10 +40,11 @@ CREATE TABLE puzzles_list (
 
 CREATE TABLE users (
   uid integer NOT NULL,
-  user_name varchar(255) DEFAULT NULL,
+  user_name varchar(255) NOT NULL,
   user_email varchar(255) NOT NULL,
   user_hash_pass varchar(255) NOT NULL,
-  user_active_time varchar(255) DEFAULT NULL,
+  user_active_time varchar(255) NOT NULL,
+  user_is_admin boolean NOT NULL,
   PRIMARY KEY (uid)
 );
 
@@ -51,7 +52,7 @@ CREATE TABLE complete_achievements (
   com_achv_id integer NOT NULL,
   achv_id integer NOT NULL,
   uid integer NOT NULL,
-  achv_receive_date timestamp NOT NULL,
+  com_achv_receive_date timestamp NOT NULL,
   PRIMARY KEY (com_achv_id),
   CONSTRAINT complete_achievements_uid_users_uid_foreign FOREIGN KEY (uid) REFERENCES users (uid),
   CONSTRAINT complete_achievements_id_ach_achievements_list_id_ach_foreign FOREIGN KEY (achv_id) REFERENCES achievements_list (achv_id)
@@ -65,17 +66,6 @@ CREATE TABLE lobbies_users (
   PRIMARY KEY (lob_usr_id),
   CONSTRAINT lobby_user_list_uid_users_uid_foreign FOREIGN KEY (uid) REFERENCES users (uid),
   CONSTRAINT lobbies_users_lob_id_lobbies_lob_id_foreign FOREIGN KEY (lob_id) REFERENCES lobbies (lob_id)
-);
-
-CREATE TABLE messages (
-  msg_id integer NOT NULL,
-  msg_sender_uid integer NOT NULL,
-  msg_recipient_uid integer NOT NULL,
-  msg_text varchar(255) NOT NULL,
-  msg_time varchar(255) NOT NULL,
-  PRIMARY KEY (msg_id),
-  CONSTRAINT messages_uid_sender_users_uid_foreign FOREIGN KEY (msg_sender_uid) REFERENCES users (uid),
-  CONSTRAINT messages_uid_recipient_users_uid_foreign FOREIGN KEY (msg_recipient_uid) REFERENCES users (uid)
 );
 
 CREATE TABLE notifications_users (
@@ -92,7 +82,7 @@ CREATE TABLE process_achievements (
   prc_achv_id integer NOT NULL,
   achv_id integer NOT NULL,
   uid integer NOT NULL,
-  achv_pass integer NOT NULL,
+  prc_achv_pass integer NOT NULL,
   PRIMARY KEY (prc_achv_id),
   CONSTRAINT process_achievements_uid_users_uid_foreign FOREIGN KEY (uid) REFERENCES users (uid),
   CONSTRAINT process_achievements_id_ach_achievements_list_id_ach_foreign FOREIGN KEY (achv_id) REFERENCES achievements_list (achv_id)

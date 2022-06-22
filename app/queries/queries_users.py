@@ -32,7 +32,7 @@ async def get_user_password(username: str) -> str:
     query = f"""
          select user_hash_pass
          from users
-         where user_name = $1s
+         where user_name = $1
        """
     return await DB.conn.fetchval(query, username)
 
@@ -113,8 +113,8 @@ async def get_user_list_by_active_time() -> list:
 
 async def post_user_registration(username: str, email: str, hash_pass: dict) -> None:
     query = f"""
-         insert into users(user_name, user_email, user_hash_pass)
-         values($1, $2, $3)
+         insert into users(user_name, user_email, user_hash_pass, user_active_time, user_is_admin)
+         values($1, $2, $3, 0, false)
        """
     await DB.conn.execute(query, username, email, ujson.dumps(hash_pass))
 

@@ -67,7 +67,7 @@ async def auth(request: Request, body: User_Auth) -> HTTPException:
     if not await get_user_name_check_exist(user_name):
         raise HTTPException(status_code=404, detail=f"User {user_name} not found")
 
-    db_pass = await get_pass(user_name)
+    db_pass = await get_user_password(user_name)
 
     if not await check_password_hash(user_password, db_pass):
         raise HTTPException(status_code=409, detail=f"Wrong password")
@@ -76,7 +76,7 @@ async def auth(request: Request, body: User_Auth) -> HTTPException:
 
 
 @routerUser.get("/profile/{uid}")
-async def profile(uid: int) -> HTTPException:
+async def profile(uid: int) -> UJSONResponse:
     if not await get_uid_check_exist(uid):
         raise HTTPException(status_code=404, detail=f"User with uid {uid} not found")
 
