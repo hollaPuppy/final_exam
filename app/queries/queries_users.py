@@ -65,7 +65,7 @@ async def get_user_by_uid_check(uid: int) -> bool:
     return await DB.conn.fetchval(query, uid)
 
 
-async def get_uid_by_username(username: str) -> str:
+async def get_uid_by_user_name(username: str) -> str:
     query = f"""
          select uid
          from users
