@@ -12,7 +12,7 @@ from ..queries.queries_users import get_uid_check_exist, \
                                     get_email_check_exist, \
                                     get_user_name_check_exist, \
                                     get_user_password, \
-                                    get_uid_by_username, \
+                                    get_uid_by_user_name, \
                                     get_user_list_by_active_time, \
                                     post_user_registration, \
                                     put_user_active_time, \
@@ -53,7 +53,7 @@ async def reg(request: Request, body: User_Reg) -> UJSONResponse:
     if await post_user_registration(user_name, user_email, hash_pass) is not None:
         raise HTTPException(status_code=500, detail=f"User has not been registered")
 
-    uid = await get_uid_by_username(user_name)
+    uid = await get_uid_by_user_name(user_name)
 
     return UJSONResponse({'uid': uid})
 
