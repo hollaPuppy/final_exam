@@ -3,8 +3,7 @@ from fastapi import APIRouter, \
                     HTTPException
 from fastapi.responses import UJSONResponse
 from datetime import datetime
-from .schemas.notifications import Notifications_List, \
-                                   Notifications_Post_New, \
+from .schemas.notifications import Notifications_Post_New, \
                                    Notifications_Put_Opened
 from ..queries.queries_notifications import get_ntfct_list_by_username, \
                                             get_ntfct_id_by_title_text_date, \
@@ -35,10 +34,10 @@ async def notifications_post(user_name: str, request: Request, body: Notificatio
     ntfct_title = req.get("ntfct_title")
     ntfct_text = req.get("ntfct_text")
     ntfct_date = req.get("ntfct_date")
-    if not await get_check_username_exist(user_name):
+    if not await get_user_name_check_exist(user_name):
         raise HTTPException(status_code=404, detail=f"User {user_name} not found")
 
-    if ntfct_date == "":
+    if not ntfct_date:
         ntfct_date = datetime.now()
 
     if await post_ntfct_body(ntfct_title, ntfct_text, ntfct_date) is not None:
@@ -57,7 +56,7 @@ async def notifications_post(request: Request, body: Notifications_Put_Opened) -
     req: dict = await request.json()
     ntfct_id = req.get("ntfct_id")
     user_name = req.get("user_name")
-    if not await get_check_username_exist(user_name):
+    if not await get_user_name_check_exist(user_name):
         raise HTTPException(status_code=404, detail=f"User {user_name} not found")
 
     if await put_ntfct_for_user(ntfct_id, user_name) is not None:

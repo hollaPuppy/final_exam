@@ -5,7 +5,7 @@ import ujson
 
 from random import randint
 
-from config import EMAIL_PASSWORD
+from ..settings import EMAIL_PASSWORD
 
 
 async def hash_password(user_password: str) -> dict:

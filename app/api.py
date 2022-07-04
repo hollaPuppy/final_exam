@@ -3,10 +3,8 @@ from app.routes import users, \
                        achievements, \
                        saves, \
                        lobbies, \
-                       notifications, \
-                       admin
+                       notifications
 from .db import DB
-from fastapi.staticfiles import StaticFiles
 
 
 app = FastAPI(title='backend for PC video-game')
@@ -15,9 +13,6 @@ app.include_router(achievements.routerAchievements)
 app.include_router(saves.routerSave)
 app.include_router(lobbies.routerLobbies)
 app.include_router(notifications.routerNotifications)
-app.include_router(admin.routerAdmin)
-
-app.mount("/static", StaticFiles(directory="app/templates"), name="static")
 
 
 @app.on_event("startup")
