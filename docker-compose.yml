@@ -1,0 +1,29 @@
+version: '3'
+
+services:
+  api:
+    build: .
+    command: uvicorn app.api:app --host 0.0.0.0 --port 3000
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL_LOCAL=postgresql://fastapi_user:fastapi_pass@db:5432/fastapi_api
+      - CONFIG_PASSWORD_EXAMPLE=qaz1xsw2edc3
+      - CONFIG_EMAIL_EXAMPLE=emailname@email.ru
+    depends_on:
+      - db
+  
+  db:
+    image: postgres:13-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    expose:
+      - 5432
+    environment:
+      - POSTGRES_USER=fastapi_user
+      - POSTGRES_PASSWORD=fastapi_pass
+      - POSTGRES_DB=fastapi_api
+
+volumes:
+  postgres_data:

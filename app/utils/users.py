@@ -5,8 +5,6 @@ import ujson
 
 from random import randint
 
-from ..settings import EMAIL_PASSWORD
-
 
 async def hash_password(user_password: str) -> dict:
     salt = os.urandom(32).hex()
@@ -28,7 +26,7 @@ async def send_confirm_letter(email: str) -> str:
     text_mail = f"Please, do not reply to this message!\nYour confirm code: {conf_code}."
 
     sender = "bestgamenoreply@gmail.com"
-    password = EMAIL_PASSWORD
+    password = "CONFIG_PASSWORD_EXAMPLE"
     server = smtplib.SMTP("smtp.gmail.com", 587)
     server.starttls()
 
