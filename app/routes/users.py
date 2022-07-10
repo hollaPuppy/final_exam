@@ -22,7 +22,7 @@ from .schemas.users import User_Reg, \
                            User_Auth, \
                            User_Active_Time_Put, \
                            User_Info_Put
-from tasks.tasks_ursers import test_task
+from ..worker import worker_cel
 
 routerUser = APIRouter(
     prefix='/users',
@@ -64,7 +64,6 @@ async def auth(request: Request, body: User_Auth) -> HTTPException:
     req: dict = await request.json()
     user_name = req.get("user_name")
     user_password = req.get("user_password")
-    test_task.delay()
 
     if not await get_user_name_check_exist(user_name):
         raise HTTPException(status_code=404, detail=f"User {user_name} not found")
@@ -132,3 +131,10 @@ async def put_profile(request: Request, uid: int, body: User_Info_Put) -> HTTPEx
         raise HTTPException(status_code=404, detail=f"Profile dont update")
 
     raise HTTPException(status_code=200, detail=f"OK")
+
+
+@routerUser.get("/test_task")
+async def mda() -> UJSONResponse:
+    task_name = "hello.task"
+    task = worker_cel.send_task(task_name)
+    return UJSONResponse({'info': {task}})

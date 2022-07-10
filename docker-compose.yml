@@ -3,18 +3,21 @@ version: '3'
 services:
   api:
     container_name: rest-api
-    build: .
+    build:
+      context: .
+      dockerfile: DockerfileApi
     command: uvicorn app.api:app --host 0.0.0.0 --port 5435
     restart: unless-stopped
-    ports:
-      - "5435:5435"
+    expose:
+      - 5435
     environment:
-      - DATABASE_URL_LOCAL=postgresql://fastapi_user:fastapi_pass@db:5432/fastapi_api
+      - DATABASE_URL_LOCAL=postgresql://fastapi_user:fastapi_pass@localhost:5432/fastapi_api
       - CONFIG_PASSWORD_EXAMPLE=qaz1xsw2edc3
       - CONFIG_EMAIL_EXAMPLE=emailname@email.ru
     depends_on:
-      - worker
-  
+      - redis
+    network_mode: host
+
   db:
     container_name: api-db
     image: postgres:13-alpine
@@ -26,29 +29,36 @@ services:
       - POSTGRES_USER=fastapi_user
       - POSTGRES_PASSWORD=fastapi_pass
       - POSTGRES_DB=fastapi_api
+    network_mode: host
 
   worker:
     container_name: worker
-    build: .
-    command: celery --app app worker -loglevel INFO
-    working_dir: /app
-      - ./:/app
-    expose:
-      - 5434
+    build:
+      dockerfile: DockerfileCelery
+      context: .
+    volumes:
+      - ./:/app/
+      - celery_data:/data
+    network_mode: host
     environment:
-      - CELERY_BROKER_URL=redis://redis:5433/0
-      - CELERY_RESULT_BACKEND=redis://redis:5433/0
+      - C_FORCE_ROOT=true
+      - CELERY_BROKER_URL=redis://localhost:6379/0
+      - CELERY_RESULT_BACKEND=redis://localhost:6379/0
     depends_on:
       - redis
+    
 
   redis:
     container_name: redis
-    image: redis:6-alpine
-    expose:
-      - 5433
+    image: redis
     depends_on:
       - db
+    expose:
+      - 6379
+    network_mode: host
 
 
 volumes:
   postgres_data:
+  celery_data:
+  

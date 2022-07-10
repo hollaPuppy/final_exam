@@ -18,6 +18,3 @@ if not EMAIL_EXAMPLE:
     from config import CONFIG_EMAIL_EXAMPLE
 
     EMAIL_EXAMPLE = CONFIG_EMAIL_EXAMPLE
-
-
-BROKER_URL: str = os.getenv('CELERY_BROKER_URL')

@@ -5,7 +5,6 @@ from app.routes import users, \
                        lobbies, \
                        notifications
 from .db import DB
-from celery import Celery
 
 
 app = FastAPI(title='backend for PC video-game')
@@ -14,8 +13,6 @@ app.include_router(achievements.routerAchievements)
 app.include_router(saves.routerSave)
 app.include_router(lobbies.routerLobbies)
 app.include_router(notifications.routerNotifications)
-
-worker = Celery('worker', broker='redis://redis:5433/0')
 
 
 @app.on_event("startup")

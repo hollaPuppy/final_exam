@@ -20,5 +20,5 @@ COPY --chown=newuser:newuser ./requirements.txt /config/requirements.txt
 
 COPY . .
 
-RUN pip install --user --no-cache-dir -r /config/requirements.txt
+RUN pip install --user -r /config/requirements.txt
 
