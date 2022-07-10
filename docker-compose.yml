@@ -2,19 +2,21 @@ version: '3'
 
 services:
   api:
+    container_name: rest-api
     build: .
-    command: uvicorn app.api:app --host 0.0.0.0 --port 3000
+    command: uvicorn app.api:app --host 0.0.0.0 --port 5435
     restart: unless-stopped
     ports:
-      - "3000:3000"
+      - "5435:5435"
     environment:
       - DATABASE_URL_LOCAL=postgresql://fastapi_user:fastapi_pass@db:5432/fastapi_api
       - CONFIG_PASSWORD_EXAMPLE=qaz1xsw2edc3
       - CONFIG_EMAIL_EXAMPLE=emailname@email.ru
     depends_on:
-      - db
+      - worker
   
   db:
+    container_name: api-db
     image: postgres:13-alpine
     volumes:
       - postgres_data:/var/lib/postgresql/data/
@@ -24,6 +26,29 @@ services:
       - POSTGRES_USER=fastapi_user
       - POSTGRES_PASSWORD=fastapi_pass
       - POSTGRES_DB=fastapi_api
+
+  worker:
+    container_name: worker
+    build: .
+    command: celery --app app worker -loglevel INFO
+    working_dir: /app
+      - ./:/app
+    expose:
+      - 5434
+    environment:
+      - CELERY_BROKER_URL=redis://redis:5433/0
+      - CELERY_RESULT_BACKEND=redis://redis:5433/0
+    depends_on:
+      - redis
+
+  redis:
+    container_name: redis
+    image: redis:6-alpine
+    expose:
+      - 5433
+    depends_on:
+      - db
+
 
 volumes:
   postgres_data:

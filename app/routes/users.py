@@ -1,3 +1,4 @@
+from cgi import test
 from fastapi import APIRouter, \
                     Request, \
                     HTTPException
@@ -21,6 +22,7 @@ from .schemas.users import User_Reg, \
                            User_Auth, \
                            User_Active_Time_Put, \
                            User_Info_Put
+from tasks.tasks_ursers import test_task
 
 routerUser = APIRouter(
     prefix='/users',
@@ -49,7 +51,6 @@ async def reg(request: Request, body: User_Reg) -> UJSONResponse:
     # if len(answer_code_or_ex) != 4:
     #     raise HTTPException(status_code=500, detail=f"Bad email sending with {answer_code_or_ex}")
     # больше не работает...............
-
     if await post_user_registration(user_name, user_email, hash_pass) is not None:
         raise HTTPException(status_code=500, detail=f"User has not been registered")
 
@@ -63,6 +64,7 @@ async def auth(request: Request, body: User_Auth) -> HTTPException:
     req: dict = await request.json()
     user_name = req.get("user_name")
     user_password = req.get("user_password")
+    test_task.delay()
 
     if not await get_user_name_check_exist(user_name):
         raise HTTPException(status_code=404, detail=f"User {user_name} not found")
