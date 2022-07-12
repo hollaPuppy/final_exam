@@ -1,6 +1,6 @@
 import os
 import hashlib
-import smtplib
+
 import ujson
 
 from random import randint
@@ -21,24 +21,6 @@ async def check_password_hash(user_password: str, password_hash: str) -> bool:
     return key == new_key
 
 
-async def send_confirm_letter(email: str) -> str:
-    conf_code = str(randint(1000, 9999))
-    text_mail = f"Please, do not reply to this message!\nYour confirm code: {conf_code}."
-
-    sender = "bestgamenoreply@gmail.com"
-    password = "CONFIG_PASSWORD_EXAMPLE"
-    server = smtplib.SMTP("smtp.gmail.com", 587)
-    server.starttls()
-
-    try:
-        server.login(sender, password)
-        server.sendmail(sender, email, f"Subject: Confirm code\n{text_mail}")
-    except Exception as _ex:
-        return f"{_ex}\n Check account data pls"
-
-    return conf_code
-
-
 async def parse_active_time(profile_list: dict):
     raw_active_time = int(profile_list.get('user_active_time'))
     dict_time = {'hours': 0, 'minutes': 0, 'seconds': 0}
@@ -51,3 +33,8 @@ async def parse_active_time(profile_list: dict):
     profile_list['user_active_time'] = dict_time
 
     return profile_list
+
+
+async def gencode():
+    rand_code = str(randint(1000, 9999))
+    return rand_code

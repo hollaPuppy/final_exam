@@ -14,6 +14,8 @@ services:
       - DATABASE_URL_LOCAL=postgresql://fastapi_user:fastapi_pass@localhost:5432/fastapi_api
       - CONFIG_PASSWORD_EXAMPLE=qaz1xsw2edc3
       - CONFIG_EMAIL_EXAMPLE=emailname@email.ru
+      - CONFIG_EMAIL_SMTP=test@mail.ru
+      - CONFIG_PASSWORD_SMTP=qwerty123456
     depends_on:
       - redis
     network_mode: host

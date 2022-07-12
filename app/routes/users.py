@@ -4,7 +4,7 @@ from fastapi import APIRouter, \
                     HTTPException
 from fastapi.responses import UJSONResponse
 from ..utils.users import hash_password, \
-                          send_confirm_letter, \
+                          gencode, \
                           check_password_hash
 from ..queries.queries_users import get_uid_check_exist, \
                                     get_user_info_by_uid, \
@@ -22,7 +22,7 @@ from .schemas.users import User_Reg, \
                            User_Auth, \
                            User_Active_Time_Put, \
                            User_Info_Put
-from ..worker import worker_cel
+from worker import tasks
 
 routerUser = APIRouter(
     prefix='/users',
@@ -36,9 +36,12 @@ async def reg(request: Request, body: User_Reg) -> UJSONResponse:
     user_name = req.get("user_name")
     user_email = req.get("user_email")
     user_password = req.get("user_password")
+    code = await gencode()
 
     if await get_email_check_exist(user_email):
         raise HTTPException(status_code=409, detail=f"Email already exists")
+
+    tasks.task_send_cofirm_letter.delay(user_email, code)
 
     if await get_user_name_check_exist(user_name):
         raise HTTPException(status_code=409, detail=f"User already exists")
@@ -47,16 +50,12 @@ async def reg(request: Request, body: User_Reg) -> UJSONResponse:
     if len(user_password) < 8:
         raise HTTPException(status_code=409, detail=f"Password is too short")
 
-    # answer_code_or_ex = await send_confirm_letter(user_email)
-    # if len(answer_code_or_ex) != 4:
-    #     raise HTTPException(status_code=500, detail=f"Bad email sending with {answer_code_or_ex}")
-    # больше не работает...............
     if await post_user_registration(user_name, user_email, hash_pass) is not None:
         raise HTTPException(status_code=500, detail=f"User has not been registered")
 
     uid = await get_uid_by_user_name(user_name)
 
-    return UJSONResponse({'uid': uid})
+    return UJSONResponse({'uid': uid, 'code': code})
 
 
 @routerUser.get("/auth")
@@ -134,7 +133,6 @@ async def put_profile(request: Request, uid: int, body: User_Info_Put) -> HTTPEx
 
 
 @routerUser.get("/test_task")
-async def mda() -> UJSONResponse:
-    task_name = "hello.task"
-    task = worker_cel.send_task(task_name)
-    return UJSONResponse({'info': {task}})
+async def mda() -> HTTPException:
+    
+    raise HTTPException(status_code=200, detail=f"OK")
