@@ -47,7 +47,7 @@ async def notifications_post(user_name: str, request: Request, body: Notificatio
 
     if not await get_list_uids_and_ntfct(ntfct_id, user_name):
         raise HTTPException(status_code=501, detail=f"Write to database failed")
-    # кринж все переделать
+    
     return HTTPException(status_code=200, detail=f"{ntfct_id}")
 
 
