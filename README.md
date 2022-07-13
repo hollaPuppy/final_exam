@@ -44,5 +44,5 @@ alembic upgrade head
 
 # Используемые средства для разработки:
 
-###FastAPI, asyncpg, postreSQL, celery, redis, docker, docker-compose, alembic, pytest, 
+### FastAPI, asyncpg, postreSQL, celery, redis, docker, docker-compose, alembic, pytest, 
 
